@@ -1,0 +1,4 @@
+windows-curses; platform_system == "Windows"
+
+## python -m pip install -r requirements.txt
+# pour installer tout les dépendances 
