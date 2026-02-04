@@ -19,7 +19,7 @@ def connection_test(server_ip, server_name) :
     }
 
     try : 
-        response = tester.resolve('google.com', 'A')
+        response = tester.resolve('google.com', 'A') #A = IPv4 address record
         res["response_details"] = f"Test OK: {response[0]}"
         return res
     
@@ -34,6 +34,6 @@ def connection_test(server_ip, server_name) :
     return res
 
 
-#test = connection_test("192.168.152.245", "server_name")
+test = connection_test("192.168.152.245", "DNS Server")
 
-#print(json.dumps(test, indent=2))
+print(json.dumps(test, indent=2))
