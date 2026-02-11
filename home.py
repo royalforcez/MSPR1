@@ -49,28 +49,48 @@ def screen_home(stdscr):
     current = 0
 
     while True:
-        stdscr.clear()
+        # --- RÉINITIALISATION TOTALE ---
+        stdscr.attrset(0)  # Éteint tous les attributs (couleurs/gras)
+        stdscr.clear()     # Efface l'écran complètement
+        
+        # On redéfinit les paires ici pour écraser les changements des modules
+        curses.init_pair(1, curses.COLOR_WHITE, -1)  # Blanc (Normal)
+        curses.init_pair(2, curses.COLOR_GREEN, -1)  # Vert (Sélection)
+        curses.init_pair(3, curses.COLOR_CYAN, -1)   # Cyan (Titre)
+
         h, w = stdscr.getmaxyx()
 
-        # Titre
+        # Titre (Cyan)
         x_title = (w - max(len(l) for l in APP_NAME)) // 2
         stdscr.attron(curses.color_pair(3))
         for i, line in enumerate(APP_NAME):
-            stdscr.addstr(i, x_title, line)
+            if i < h: # Sécurité
+                stdscr.addstr(i, x_title, line)
         stdscr.attroff(curses.color_pair(3))
 
         frame_top = len(APP_NAME) + 1
         draw_frame(stdscr, frame_top)
 
+        # Menu
         for i, module in enumerate(MODULES):
-            color = curses.color_pair(2 if i == current else 1)
-            stdscr.attron(color)
-            stdscr.addstr(frame_top + 2 + i, 4, module)
-            stdscr.attroff(color)
+            # On définit la couleur : Vert si courant, sinon Blanc
+            cp = curses.color_pair(2 if i == current else 1)
+            
+            # On applique la couleur et on force le texte normal pour les non-sélectionnés
+            stdscr.attrset(cp) 
+            if i == current:
+                stdscr.attron(curses.A_BOLD)
+                stdscr.addstr(frame_top + 2 + i, 4, f"> {module}")
+                stdscr.attroff(curses.A_BOLD)
+            else:
+                stdscr.addstr(frame_top + 2 + i, 4, f"  {module}")
 
+        # Footer
+        stdscr.attrset(curses.color_pair(1))
         footer = "↑ ↓ naviguer | ENTER sélectionner | Q quitter"
         stdscr.addstr(h - 1, (w - len(footer)) // 2, footer)
 
+        stdscr.refresh()
         key = stdscr.getch()
 
         if key == curses.KEY_UP and current > 0:
@@ -88,3 +108,4 @@ def screen_home(stdscr):
                 break
         elif key in (ord("q"), ord("Q")):
             break
+        
