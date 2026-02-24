@@ -20,7 +20,7 @@ def get_db_data():
         )
         cursor = conn.cursor(dictionary=True)
         
-        # Requête optimisée : Correction de la jointure Sites (s.ID)
+        # Requête optimisée
         query = """
         SELECT 
             e.Nom, e.IPv4, eol.OS, eol.Version, 
@@ -55,14 +55,14 @@ def screen_diagnostic(stdscr):
         h, w = stdscr.getmaxyx()
         filtered_data = [] 
 
-        # --- 1. LOGIQUE DE CACHE (DÉCOUPLAGE BDD / AFFICHAGE) ---
+        # --- 1. LOGIQUE DE CACHE ---
         if not cached_data or (current_time - last_db_update > REFRESH_INTERVAL):
             new_data = get_db_data()
             if isinstance(new_data, list):
                 cached_data = new_data
                 last_db_update = current_time
 
-        # --- 2. DESSIN DU HEADER (ONGLETS) ---
+        # --- 2. DESSIN DU HEADER ---
         stdscr.addstr(1, 0, " " * w) 
         for i, tab_name in enumerate(tabs):
             style = curses.A_REVERSE | curses.A_BOLD if i == active_tab else curses.color_pair(3)
@@ -70,7 +70,6 @@ def screen_diagnostic(stdscr):
 
         # --- 3. LOGIQUE D'AFFICHAGE ---
         if active_tab == 0:
-            # Barre de recherche
             stdscr.attrset(0)
             stdscr.addstr(3, 2, "RECHERCHE : ", curses.A_BOLD)
             stdscr.addstr(3, 15, search_text + "_", curses.color_pair(2))
@@ -82,11 +81,10 @@ def screen_diagnostic(stdscr):
             col_up, col_site = int(w * 0.15), int(w * 0.12)
 
             def fmt(text, size, last=False):
-                t = str(text) if text else "N/A"
+                t = str(text) if text is not None else "N/A"
                 content = t[:size-2].ljust(size-1)
                 return content if last else f"{content}|"
 
-            # En-tête du tableau
             header = (f"{fmt('NOM', col_nom)}{fmt('IP', col_ip)}{fmt('OS', col_os)}"
                       f"{fmt('VERSION', col_ver)}{fmt('CPU', col_cpu)}"
                       f"{fmt('RAM', col_ram)}{fmt('UPTIME', col_up)}{fmt('SITE', col_site, True)}")
@@ -95,7 +93,7 @@ def screen_diagnostic(stdscr):
             stdscr.addstr(5, 1, header[:w-2])
             stdscr.attroff(curses.A_UNDERLINE | curses.color_pair(3))
 
-            # Filtrage des données (depuis le cache)
+            # Filtrage
             filtered_data = [d for d in cached_data if search_text.lower() in d['Nom'].lower()]
             
             if selected_row >= len(filtered_data):
@@ -104,16 +102,19 @@ def screen_diagnostic(stdscr):
             y_offset = 6
             for i, srv in enumerate(filtered_data):
                 if y_offset < h - 2:
+                    # --- SÉCURISATION DES DONNÉES (Fix TypeError) ---
+                    cpu_val = srv.get('CPU') if srv.get('CPU') is not None else 0
+                    ram_val = srv.get('RAM') if srv.get('RAM') is not None else 0
+                    
                     line_str = (f"{fmt(srv['Nom'], col_nom)}{fmt(srv['IPv4'], col_ip)}{fmt(srv['OS'], col_os)}"
-                                f"{fmt(srv['Version'], col_ver)}{fmt(str(srv['CPU'])+'%', col_cpu)}"
-                                f"{fmt(str(srv['RAM'])+'G', col_ram)}{fmt(srv['uptime'], col_up)}"
+                                f"{fmt(srv['Version'], col_ver)}{fmt(str(cpu_val)+'%', col_cpu)}"
+                                f"{fmt(str(ram_val)+'G', col_ram)}{fmt(srv['uptime'], col_up)}"
                                 f"{fmt(srv['Site'], col_site, True)}")
 
-                    # Style : Inversion si sélectionné, Rouge si CPU > 80
                     if i == selected_row:
                         style = curses.color_pair(2) | curses.A_REVERSE
                     else:
-                        style = curses.color_pair(4) if srv.get('CPU', 0) > 80 else 0
+                        style = curses.color_pair(4) if cpu_val > 80 else 0
 
                     stdscr.addstr(y_offset, 1, line_str[:w-2], style)
                     y_offset += 1
@@ -121,7 +122,7 @@ def screen_diagnostic(stdscr):
         elif active_tab == 1:
             draw_services_interface(stdscr, h, w)
 
-        # --- 4. INDICATEUR SYNC & FOOTER ---
+        # --- 4. FOOTER ET SYNC ---
         timer = int(REFRESH_INTERVAL - (current_time - last_db_update))
         stdscr.addstr(0, w-20, f"Sync: {max(0, timer)}s", curses.A_DIM)
         stdscr.attrset(0)
@@ -129,7 +130,7 @@ def screen_diagnostic(stdscr):
         
         stdscr.refresh()
 
-        # --- 5. GESTION DU CLAVIER ---
+        # --- 5. GESTION CLAVIER ---
         try:
             key = stdscr.getch()
         except:
