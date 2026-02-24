@@ -136,6 +136,10 @@ def screen_diagnostic(stdscr):
         except:
             key = -1
 
+        if key == 27: # Touche ESC pour quitter
+            stdscr.nodelay(False) # <--- RÉTABLIT LE MODE BLOQUANT ICI
+            break
+
         if key == 27: break
         elif key == curses.KEY_F1: active_tab = 0
         elif key == curses.KEY_F2: active_tab = 1
