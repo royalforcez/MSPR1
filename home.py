@@ -1,6 +1,6 @@
 import curses
 from ui import draw_frame
-from diagnostic import screen_diagnostic
+from diagnostic_module import screen_diagnostic
 from wms_backup import screen_wms_backup
 from obsolescence import screen_obsolescence_audit
 
