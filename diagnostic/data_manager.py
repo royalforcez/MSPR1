@@ -4,15 +4,14 @@ def get_db_data():
     """Récupère les données consolidées selon le nouveau schéma MariaDB."""
     try:
         conn = mysql.connector.connect(
-            host="127.0.0.1",
-            user="root",
-            password="",
+            host="192.168.1.137",
+            user="admin_ntl",
+            password="Formation2025",
             database="ntlsystools",
             connect_timeout=2  # Augmenté légèrement pour la stabilité
         )
         cursor = conn.cursor(dictionary=True)
         
-        # Requête adaptée à ta nouvelle structure
         # On utilise MAX(r.ID) ou un tri pour ne prendre que la dernière ressource connue
         query = """
         SELECT 
@@ -47,9 +46,9 @@ def check_db_health():
     """Vérifie si le serveur MariaDB répond."""
     try:
         conn = mysql.connector.connect(
-            host="127.0.0.1", 
-            user="root", 
-            password="", 
+            host="192.168.1.137",
+            user="admin_ntl",
+            password="Formation2025",
             database="ntlsystools",
             connect_timeout=1
         )

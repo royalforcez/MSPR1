@@ -10,9 +10,9 @@ from datetime import datetime
 
 def get_db_config():
     return {
-        "host": "127.0.0.1",
-        "user": "root",
-        "password": "",
+        "host": "192.168.1.137",
+        "user": "admin_ntl",
+        "password": "Formation2025",
         "database": "ntlsystools"
     }
 
