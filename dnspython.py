@@ -33,20 +33,20 @@ def connection_test(server_ip, server_name) :
 
     return res
 
-tab = [{"ip":"192.168.10.10","nom":"DC01"},
-        {"ip":"192.168.10.11","nom":"DC02"}]
+tab = [{"ip":"192.168.10.10","name":"DC01"},
+        {"ip":"192.168.10.11","name":"DC02"}]
 
 rapport = []
 
-for i in tab :
-    test = connection_test(i["ip"], i["nom"])
-    rapport.append(test)
+#for i in tab :
+    #test = connection_test(i["ip"], i["name"])
+    #rapport.append(test)
 
-print(json.dumps(rapport, indent=2))
+#print(json.dumps(rapport, indent=2))
     
 
 
 
-test = connection_test("192.168.87.134", "DNS Server")
+test = connection_test("192.168.179.128", "DNS Server")
 
 print(json.dumps(test, indent=2))
