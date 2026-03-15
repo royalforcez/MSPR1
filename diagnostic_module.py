@@ -21,7 +21,7 @@ def screen_diagnostic(stdscr):
     active_tab = 0 
     selected_row = 0 
     db_online = False 
-    tabs = [" [F1] GÉNÉRAL ", " [F2] ÉTAT SERVICES ", " [F3] SERVICES "]
+    tabs = [" [F1] GÉNÉRAL ", " [F2] ÉTAT SERVICES "]
 
     while True:
         current_time = time.time()
