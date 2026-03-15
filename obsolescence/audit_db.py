@@ -23,10 +23,10 @@ def fetch_assets_from_db():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT hostname, ip, os_name, os_version
-        FROM assets
-        WHERE os_name IS NOT NULL
-        AND os_version IS NOT NULL
+      SELECT Nom, IPv4, OS, OS_Version
+        FROM Equipements
+        WHERE OS IS NOT NULL
+        AND OS_Version IS NOT NULL
     """)
 
     rows = cur.fetchall()
