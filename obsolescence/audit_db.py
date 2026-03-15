@@ -14,7 +14,7 @@ def fetch_assets_from_db():
             host="192.168.1.137",
             user="admin_ntl",
             password="Formation2025",
-            database="mspr"
+            database="ntlsystools"
         )
 
     except mysql.connector.Error as err:
