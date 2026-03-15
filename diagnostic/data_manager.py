@@ -10,6 +10,7 @@ def get_db_data():
             database="ntlsystools",
             connect_timeout=2  # Augmenté légèrement pour la stabilité
         )
+        
         cursor = conn.cursor(dictionary=True)
         
         # On utilise MAX(r.ID) ou un tri pour ne prendre que la dernière ressource connue
@@ -46,9 +47,9 @@ def check_db_health():
     """Vérifie si le serveur MariaDB répond."""
     try:
         conn = mysql.connector.connect(
-            host="192.168.1.137",
-            user="admin_ntl",
-            password="Formation2025",
+            host="127.0.0.1",
+            user="root",
+            password="",
             database="ntlsystools",
             connect_timeout=1
         )

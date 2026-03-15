@@ -2,72 +2,89 @@ import curses
 import mysql.connector
 import csv
 import os
+import smbclient
 from datetime import datetime
 
 # =========================================================
-# LOGIQUE DE CONNEXION (Inchangée)
+# CONFIGURATIONS
 # =========================================================
 
-def get_db_config():
+def get_available_databases():
+    """ Liste des bases de données disponibles avec leurs configs respectives """
+    return [
+        {
+            "display": "💻 BASE DE DONNÉES TP (ntlsystools)",  # base de donnée ntl
+            "config": {
+                "host": "192.168.1.137",
+                "user": "admin_ntl",
+                "password": "Formation2025",
+                "database": "ntlsystools"
+            }
+        },
+        {
+            "display": "🏢 BASE DE DONNÉES ENTREPRISE (prod_wms)", # base de donnéee de l'entreprise
+            "config": {
+                "host": "127.0.0.1", # À modifier si l'IP est différente
+                "user": "root",
+                "password": "",
+                "database": "prod_wms"
+            }
+        }
+    ]
+
+def get_nas_config():
+    """ Configuration pour le NAS de Lille """
     return {
-        "host": "192.168.1.137",
-        "user": "admin_ntl",
-        "password": "Formation2025",
-        "database": "ntlsystools"
+        "ip": "192.168.5.2", # ip du nas à rensigner 
+        "user": "admin_ntl", # identifiant à rensigner
+        "password": "admin_ntl",
+        "share": "NAS-Lille" # non du folder partager par le nas
     }
 
-def get_all_tables():
-    config = get_db_config()
+# =========================================================
+# LOGIQUE DE SAUVEGARDE ET TRANSFERT
+# =========================================================
+
+def save_to_nas(local_file_path):
+    config = get_nas_config()
+    filename = os.path.basename(local_file_path)
+    remote_path = f"\\\\{config['ip']}\\{config['share']}\\{filename}"
     try:
-        conn = mysql.connector.connect(**config)
+        smbclient.register_session(config['ip'], username=config['user'], password=config['password'])
+        with open(local_file_path, 'rb') as local_f:
+            with smbclient.open_file(remote_path, mode='wb') as remote_f:
+                remote_f.write(local_f.read())
+        return True, remote_path
+    except Exception as e:
+        return False, str(e)
+
+def backup_db_to_sql(db_config):
+    backup_dir = "backups/sql"
+    if not os.path.exists(backup_dir): os.makedirs(backup_dir)
+    filename = f"{backup_dir}/backup_{db_config['database']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.sql"
+    
+    try:
+        conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
         cursor.execute("SHOW TABLES")
         tables = [row[0] for row in cursor.fetchall()]
-        conn.close()
-        return tables
-    except Exception:
-        return []
-
-# --- Fonctions de sauvegarde SQL et CSV (Inchangées) ---
-
-def backup_db_to_sql():
-    config = get_db_config()
-    backup_dir = "backups/sql"
-    if not os.path.exists(backup_dir): os.makedirs(backup_dir)
-    filename = f"{backup_dir}/backup_{config['database']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.sql"
-    tables = get_all_tables()
-    try:
-        conn = mysql.connector.connect(**config)
-        cursor = conn.cursor()
+        
         with open(filename, 'w', encoding='utf-8') as f:
-            f.write(f"-- Backup SQL Automatique\n-- Date: {datetime.now()}\n\n")
-            f.write(f"CREATE DATABASE IF NOT EXISTS `{config['database']}`;\n")
-            f.write(f"USE `{config['database']}`;\n\n")
+            f.write(f"-- Backup SQL Automatique\n-- Base: {db_config['database']}\n\n")
             for table in tables:
                 cursor.execute(f"SHOW CREATE TABLE `{table}`")
-                create_sql = cursor.fetchone()[1]
-                f.write(f"DROP TABLE IF EXISTS `{table}`;\n{create_sql};\n\n")
-                cursor.execute(f"SELECT * FROM `{table}`")
-                rows = cursor.fetchall()
-                if rows:
-                    f.write(f"INSERT INTO `{table}` VALUES \n")
-                    vals = []
-                    for r in rows:
-                        clean = ["NULL" if v is None else (str(v) if isinstance(v, (int, float)) else f"'{str(v).replace("'", "''")}'") for v in r]
-                        vals.append("(" + ", ".join(clean) + ")")
-                    f.write(",\n".join(vals) + ";\n\n")
+                f.write(f"DROP TABLE IF EXISTS `{table}`;\n{cursor.fetchone()[1]};\n\n")
         conn.close()
         return True, filename
     except Exception as e:
         return False, str(e)
 
-def export_table_to_csv(table_name):
-    config = get_db_config()
+def export_table_to_csv(table_name, db_config):
     backup_dir = "backups/csv"
     if not os.path.exists(backup_dir): os.makedirs(backup_dir)
     filename = f"{backup_dir}/export_{table_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
     try:
-        conn = mysql.connector.connect(**config)
+        conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         cursor.execute(f"SELECT * FROM `{table_name}`")
         rows = cursor.fetchall()
@@ -82,107 +99,160 @@ def export_table_to_csv(table_name):
         return False, str(e)
 
 # =========================================================
-# INTERFACE GRAPHIQUE OPTIMISÉE (ZÉRO LAG)
+# INTERFACES DE SÉLECTION (POP-UPS)
+# =========================================================
+
+def select_database_prompt(stdscr):
+    """ Demande à l'utilisateur quelle BDD utiliser au démarrage du module """
+    dbs = get_available_databases()
+    h, w = stdscr.getmaxyx()
+    win_h, win_w = 10, 60
+    start_y, start_x = (h - win_h) // 2, (w - win_w) // 2
+    
+    win = curses.newwin(win_h, win_w, start_y, start_x)
+    win.box()
+    win.keypad(True)
+    
+    choice = 0
+    while True:
+        win.attron(curses.color_pair(3))
+        win.addstr(1, (win_w - 28) // 2, " SÉLECTION DE LA BASE DE DONNÉES ", curses.A_BOLD)
+        win.attroff(curses.color_pair(3))
+        win.addstr(3, 2, "Quelle base souhaitez-vous auditer / sauvegarder ?")
+        
+        for i, db in enumerate(dbs):
+            if i == choice:
+                win.attron(curses.color_pair(2) | curses.A_REVERSE)
+                win.addstr(5 + i, 4, f" {db['display']} ")
+                win.attroff(curses.color_pair(2) | curses.A_REVERSE)
+            else:
+                win.addstr(5 + i, 4, f" {db['display']} ")
+        
+        win.refresh()
+        key = win.getch()
+        if key == curses.KEY_UP: choice = (choice - 1) % len(dbs)
+        elif key == curses.KEY_DOWN: choice = (choice + 1) % len(dbs)
+        elif key in (10, 13): return dbs[choice]['config']
+        elif key == 27: return None
+
+def ask_destination(stdscr):
+    h, w = stdscr.getmaxyx()
+    win_h, win_w = 9, 50
+    start_y, start_x = (h - win_h) // 2, (w - win_w) // 2
+    win = curses.newwin(win_h, win_w, start_y, start_x)
+    win.box(); win.keypad(True)
+    choice = 0
+    options = [" 💾  SAUVEGARDE LOCALE ", " 🌐  ENVOYER VERS LE NAS (LILLE) "]
+    while True:
+        win.addstr(1, (win_w - 22) // 2, " DESTINATION DU FLUX ", curses.color_pair(3) | curses.A_BOLD)
+        for i, opt in enumerate(options):
+            if i == choice:
+                win.attron(curses.color_pair(2) | curses.A_REVERSE)
+                win.addstr(5 + i, 4, opt)
+                win.attroff(curses.color_pair(2) | curses.A_REVERSE)
+            else:
+                win.addstr(5 + i, 4, opt)
+        win.refresh()
+        key = win.getch()
+        if key == curses.KEY_UP: choice = 0
+        elif key == curses.KEY_DOWN: choice = 1
+        elif key in (10, 13): return "local" if choice == 0 else "nas"
+        elif key == 27: return None
+
+# =========================================================
+# MODULE PRINCIPAL WMS
 # =========================================================
 
 def screen_wms_backup(stdscr):
-    # --- ÉTAPE 1 : On récupère les tables UNE SEULE FOIS au début ---
+    # --- ÉTAPE 1 : Choix de la BDD avant toute chose ---
+    selected_db_config = select_database_prompt(stdscr)
+    if not selected_db_config: return # Retour au menu principal si ESC
+
+    # --- ÉTAPE 2 : Chargement des tables de la BDD choisie ---
     stdscr.clear()
-    stdscr.addstr(2, 4, "⏳ Connexion à la base de données...", curses.color_pair(3))
-    stdscr.refresh()
-    all_tables = get_all_tables()
     
-    current = 0
-
-    while True:
-        stdscr.attrset(0)
+    # AJOUTE CETTE LIGNE ICI POUR FIXER L'ERREUR :
+    h, w = stdscr.getmaxyx() 
+    
+    stdscr.addstr(h//2, (w-30)//2, f"⏳ Chargement de {selected_db_config['database']}...", curses.color_pair(3))
+    stdscr.refresh()
+    
+    all_tables = []
+    try:
+        conn = mysql.connector.connect(**selected_db_config)
+        cursor = conn.cursor()
+        cursor.execute("SHOW TABLES")
+        all_tables = [row[0] for row in cursor.fetchall()]
+        conn.close()
+    except Exception as e:
+        # Gérer l'erreur si la BDD n'est pas accessible
         stdscr.clear()
+        stdscr.addstr(5, 4, f"❌ Impossible de se connecter à {selected_db_config['database']}", curses.color_pair(1))
+        stdscr.addstr(6, 4, str(e))
+        stdscr.getch()
+        return
 
-        curses.init_pair(1, curses.COLOR_WHITE, -1)
-        curses.init_pair(2, curses.COLOR_GREEN, -1)
-        curses.init_pair(3, curses.COLOR_CYAN, -1)
-
+    current = 0
+    while True:
+        stdscr.clear()
         h, w = stdscr.getmaxyx()
         
-        title = "Module Gestion des Sauvegardes (WMS)"
-        stdscr.attron(curses.color_pair(3))
+        # Rappel de la BDD active dans le titre
+        title = f"SAUVEGARDES : {selected_db_config['database'].upper()}"
+        stdscr.attron(curses.color_pair(3) | curses.A_BOLD)
         stdscr.addstr(2, (w - len(title)) // 2, title)
-        stdscr.attroff(curses.color_pair(3))
+        stdscr.attroff(curses.color_pair(3) | curses.A_BOLD)
 
-        # --- ÉTAPE 2 : On utilise la variable all_tables déjà chargée ---
         MODULES = ["SAUVEGARDE COMPLÈTE (SQL)"]
         MODULES += [f"EXPORT CSV : {t}" for t in all_tables]
-        MODULES.append("RETOUR (HOME)")
+        MODULES.append("RETOUR / CHANGER DE BDD")
 
         for i, module in enumerate(MODULES):
-            cp = curses.color_pair(2 if i == current else 1)
-            stdscr.attrset(cp)
             if i == current:
-                stdscr.attron(curses.A_BOLD)
+                stdscr.attron(curses.color_pair(2) | curses.A_BOLD)
                 stdscr.addstr(6 + i, 4, f"> {module}")
-                stdscr.attroff(curses.A_BOLD)
+                stdscr.attroff(curses.color_pair(2) | curses.A_BOLD)
             else:
                 stdscr.addstr(6 + i, 4, f"  {module}")
-
-        footer = "↑ ↓ naviguer | ENTER sélectionner | R rafraîchir | ESC: Home"
-        stdscr.attrset(curses.color_pair(1))
-        stdscr.addstr(h - 1, (w - len(footer)) // 2, footer)
 
         stdscr.refresh()
         key = stdscr.getch()
 
-        # Navigation (Instantanée maintenant)
-        if key == curses.KEY_UP and current > 0:
-            current -= 1
-        elif key == curses.KEY_DOWN and current < len(MODULES) - 1:
-            current += 1
+        if key == curses.KEY_UP and current > 0: current -= 1
+        elif key == curses.KEY_DOWN and current < len(MODULES) - 1: current += 1
         
-        # Action Manuelle de Rafraîchissement (Touche R)
-        elif key in (ord('r'), ord('R')):
-            stdscr.clear()
-            stdscr.addstr(5, 4, "⏳ Rafraîchissement des tables...", curses.color_pair(3))
-            stdscr.refresh()
-            all_tables = get_all_tables()
-            current = 0
-
-        # Actions (Touche Entrée)
         elif key in (10, 13):
-            if current == len(MODULES) - 1:
-                return
+            if current == len(MODULES) - 1: return 
 
-            elif current == 0:
-                stdscr.clear()
-                stdscr.addstr(5, 4, "⏳ Génération du backup SQL complet...", curses.color_pair(3))
-                stdscr.refresh()
-                success, path = backup_db_to_sql()
-                
-                stdscr.move(7, 0)
-                if success:
-                    stdscr.addstr(7, 4, "✅ Sauvegarde terminée", curses.color_pair(2))
-                    stdscr.addstr(8, 4, f"Fichier : {os.path.basename(path)}", curses.color_pair(1))
-                else:
-                    stdscr.addstr(7, 4, "❌ Erreur SQL", curses.color_pair(1))
-                    stdscr.addstr(8, 4, str(path)[:w-10])
-                
-                stdscr.addstr(10, 4, "Appuie sur une touche pour continuer")
-                stdscr.getch()
+            dest = ask_destination(stdscr)
+            if not dest: continue
 
+            stdscr.clear()
+            stdscr.addstr(5, 4, "⏳ Traitement en cours...", curses.color_pair(3))
+            stdscr.refresh()
+
+            # On passe la config sélectionnée aux fonctions
+            if current == 0:
+                success, path = backup_db_to_sql(selected_db_config)
             else:
-                table_name = all_tables[current - 1]
-                stdscr.clear()
-                stdscr.addstr(5, 4, f"⏳ Exportation de {table_name}...", curses.color_pair(3))
-                stdscr.refresh()
-                success, path = export_table_to_csv(table_name)
-                
-                if success:
-                    stdscr.addstr(7, 4, "✅ Export terminé", curses.color_pair(2))
-                    stdscr.addstr(8, 4, f"Fichier : {os.path.basename(path)}", curses.color_pair(1))
-                else:
-                    stdscr.addstr(7, 4, "❌ Erreur Export CSV", curses.color_pair(1))
-                    stdscr.addstr(8, 4, str(path)[:w-10])
-                
-                stdscr.addstr(10, 4, "Appuie sur une touche pour continuer")
-                stdscr.getch()
+                success, path = export_table_to_csv(all_tables[current - 1], selected_db_config)
 
-        elif key == 27:
-            return
+            if success and dest == "nas":
+                stdscr.addstr(7, 4, "📡 Envoi vers le NAS de Lille...")
+                stdscr.refresh()
+                nas_ok, nas_res = save_to_nas(path)
+                if nas_ok: path = nas_res
+                else: success = False; path = f"Erreur NAS: {nas_res}"
+
+            stdscr.move(10, 0)
+            if success:
+                stdscr.addstr(10, 4, f"✅ RÉUSSI ({dest.upper()})", curses.color_pair(2))
+                stdscr.addstr(11, 4, f"Fichier : {os.path.basename(path)}")
+            else:
+                stdscr.addstr(10, 4, "❌ ÉCHEC", curses.color_pair(1))
+                stdscr.addstr(11, 4, str(path))
+            
+            stdscr.addstr(13, 4, "Appuyez sur une touche...")
+            stdscr.getch()
+
+        elif key == 27: return
