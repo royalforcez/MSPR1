@@ -50,9 +50,6 @@ def get_ssh_metrics(ip, username, os_name):
     finally:
         ssh.close()
 
-# N'oublie pas d'importer la nouvelle fonction en haut du fichier :
-# from core.database import get_all_equipments, insert_metrics, insert_service_status, update_equipment_name
-
 def run_system_monitoring():
     equipments = get_all_equipments()
     for eq in equipments:
