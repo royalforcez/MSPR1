@@ -56,3 +56,10 @@ def insert_service_status(equip_id, service_name, status):
     cursor.execute(sql, (service_name, status, equip_id))
     conn.commit()
     conn.close()
+
+def update_equipment_name(equip_id, new_name):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE Equipements SET Nom = %s WHERE ID = %s", (new_name, equip_id))
+    conn.commit()
+    conn.close()

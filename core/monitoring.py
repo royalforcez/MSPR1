@@ -1,7 +1,7 @@
 import os
 import paramiko
 import socket
-from core.database import get_all_equipments, insert_metrics, insert_service_status
+from core.database import get_all_equipments, insert_metrics, insert_service_status, update_equipment_name
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -23,46 +23,53 @@ def get_ssh_metrics(ip, username, os_name):
     key_path = os.getenv('SSH_KEY_PATH', '/root/.ssh/id_rsa')
     
     try:
-        # Timeout de connexion de 5 secondes pour éviter de bloquer le script
         ssh.connect(ip, username=username, key_filename=key_path, timeout=5)
-        
-        os_str = str(os_name).upper() # On gère 'DEBIAN-13' ou 'WINDOWS-11'
+        os_str = str(os_name).upper()
 
         if "DEBIAN" in os_str or "LINUX" in os_str:
-            # Commande ultra-rapide qui ne bloque jamais
-            cmd = "top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | cut -d',' -f1; " \
+            # On ajoute 'hostname' au tout début de la commande
+            cmd = "hostname; " \
+                  "top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | cut -d',' -f1; " \
                   "free | grep Mem | awk '{print $3/$2 * 100.0}'; " \
                   "df / | tail -1 | awk '{print $5}' | sed 's/%//'; " \
                   "uptime -p"
             stdin, stdout, stderr = ssh.exec_command(cmd, timeout=5)
             res = stdout.read().decode().splitlines()
-            return float(res[0]), float(res[1]), float(res[2]), res[3]
+            # On retourne 5 valeurs maintenant (Nom, CPU, RAM, Disk, Uptime)
+            return res[0].strip(), float(res[1]), float(res[2]), float(res[3]), res[4]
 
         elif "WINDOWS" in os_str:
-            # Commande PowerShell optimisée
-            cmd = "powershell -Command \"$cpu = (Get-CimInstance Win32_Processor).LoadPercentage; $os = Get-CimInstance Win32_OperatingSystem; $ram = [math]::Round((($os.TotalVisibleMemorySize - $os.FreePhysicalMemory) / $os.TotalVisibleMemorySize) * 100, 2); $disk = Get-CimInstance Win32_LogicalDisk -Filter \\\"DeviceID='C:'\\\"; $disk_p = [math]::Round((($disk.Size - $disk.FreeSpace) / $disk.Size) * 100, 2); $up = (New-TimeSpan -Start $os.LastBootUpTime -End (Get-Date)).Hours; Write-Output $cpu; Write-Output $ram; Write-Output $disk_p; Write-Output $up\""
+            # On ajoute $env:COMPUTERNAME pour Windows
+            cmd = "powershell -Command \"Write-Output $env:COMPUTERNAME; $cpu = (Get-CimInstance Win32_Processor).LoadPercentage; $os = Get-CimInstance Win32_OperatingSystem; $ram = [math]::Round((($os.TotalVisibleMemorySize - $os.FreePhysicalMemory) / $os.TotalVisibleMemorySize) * 100, 2); $disk = Get-CimInstance Win32_LogicalDisk -Filter \\\"DeviceID='C:'\\\"; $disk_p = [math]::Round((($disk.Size - $disk.FreeSpace) / $disk.Size) * 100, 2); $up = (New-TimeSpan -Start $os.LastBootUpTime -End (Get-Date)).Hours; Write-Output $cpu; Write-Output $ram; Write-Output $disk_p; Write-Output $up\""
             stdin, stdout, stderr = ssh.exec_command(cmd, timeout=8)
-            res = stdout.read().decode().splitlines()
-            return float(res[0]), float(res[1]), float(res[2]), f"up {res[3]} hours"
+            res = stdout.read().decode().strip().splitlines()
+            return res[0].strip(), float(res[1]), float(res[2]), float(res[3]), f"up {res[4]} hours"
 
     except Exception as e:
-        # En cas d'erreur SSH, on retourne None pour ne pas faire planter le feeder
         return None
     finally:
         ssh.close()
 
+# N'oublie pas d'importer la nouvelle fonction en haut du fichier :
+# from core.database import get_all_equipments, insert_metrics, insert_service_status, update_equipment_name
+
 def run_system_monitoring():
     equipments = get_all_equipments()
     for eq in equipments:
-        # 1. On vérifie d'abord si le port SSH répond (Vérification de vie)
         status = check_port(eq['IPv4'], 22)
         insert_service_status(eq['ID'], 'Serveur (SSH)', status)
         
         if status == "UP":
-            # 2. Si UP, on tente la collecte SSH
             metrics = get_ssh_metrics(eq['IPv4'], eq['SSH_User'], eq['OS'])
             if metrics:
-                cpu, ram, disk, uptime = metrics
+                real_host, cpu, ram, disk, uptime = metrics
+                
+                # LA MAGIE EST ICI : Si le nom commence par Unknown, on le met à jour !
+                if eq['Nom'].startswith("Unknown-") and real_host:
+                    print(f"    [+] Nom mis à jour en BDD : {eq['Nom']} -> {real_host}")
+                    update_equipment_name(eq['ID'], real_host)
+                    eq['Nom'] = real_host # On met à jour l'affichage en cours
+                
                 insert_metrics(eq['ID'], cpu, ram, disk, uptime)
                 print(f"    [OK] Metrics collectées pour {eq['Nom']}")
             else:
