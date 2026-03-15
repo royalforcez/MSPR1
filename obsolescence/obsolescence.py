@@ -68,7 +68,7 @@ def screen_obsolescence_audit(stdscr):
 
         elif key in (10, 13):
 
-            # AUDIT BDD
+            # AUDIT depuis la BDD
             if current == 0:
 
                 stdscr.clear()
@@ -82,9 +82,11 @@ def screen_obsolescence_audit(stdscr):
                     last_results = audit_assets(assets, client)
 
                     json_path = write_report_json(last_results)
+                    csv_path = write_report_csv(last_results)
 
                     stdscr.addstr(7, 4, "Audit terminé")
                     stdscr.addstr(8, 4, f"Rapport JSON : {json_path}")
+                    stdscr.addstr(9, 4, f"Export CSV   : {csv_path}")
 
                 except Exception as e:
 
@@ -94,7 +96,7 @@ def screen_obsolescence_audit(stdscr):
                 stdscr.addstr(10, 4, "Appuie sur une touche pour continuer")
                 stdscr.getch()
 
-            # AUDIT CSV
+            # AUDIT depuis le CSV
             elif current == 1:
 
                 stdscr.clear()
@@ -112,9 +114,11 @@ def screen_obsolescence_audit(stdscr):
                     last_results = audit_assets(assets, client)
 
                     json_path = write_report_json(last_results)
+                    csv_path = write_report_csv(last_results)
 
                     stdscr.addstr(7, 4, "Audit terminé")
                     stdscr.addstr(8, 4, f"Rapport JSON : {json_path}")
+                    stdscr.addstr(9, 4, f"Export CSV   : {csv_path}")
 
                 except Exception as e:
 
