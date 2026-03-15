@@ -72,7 +72,7 @@ def screen_diagnostic(stdscr):
         timer = int(REFRESH_INTERVAL - (current_time - last_db_update))
         sync_txt = f"Sync: {max(0, timer)}s"
         stdscr.addstr(0, w - len(sync_txt) - 2, sync_txt, curses.A_DIM)
-        stdscr.addstr(h - 1, 1, " F1/F2/F3: Onglets | ↑↓: Naviguer | ESC: Home ", curses.A_REVERSE)
+        stdscr.addstr(h - 1, 1, " F1/F2: Onglets | ↑↓: Naviguer | ESC: Home ", curses.A_REVERSE)
         
         stdscr.refresh()
 

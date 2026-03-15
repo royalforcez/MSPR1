@@ -35,9 +35,9 @@ def get_available_databases():
 def get_nas_config():
     """ Configuration pour le NAS de Lille """
     return {
-        "ip": "192.168.5.2", # ip du nas à rensigner 
+        "ip": "192.168.1.11", # ip du nas à rensigner 
         "user": "admin_ntl", # identifiant à rensigner
-        "password": "admin_ntl",
+        "password": "Formation2025",
         "share": "NAS-Lille" # non du folder partager par le nas
     }
 
