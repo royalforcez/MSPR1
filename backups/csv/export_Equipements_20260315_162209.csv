@@ -1,0 +1,11 @@
+ID,Nom,OS,IPv4,ID_Site,ID_EOL,SSH_User
+2,ROG-STRIX-REMI,WINDOWS-11,192.168.1.182,1,,ntl_monitor
+3,BDD-SQL,DEBIAN-13,192.168.1.137,1,,ntl_monitor
+5,serv-mc,DEBIAN-13,192.168.1.180,1,,root
+6,Unknown-192.168.1.131,Linux,192.168.1.131,1,,root
+7,Unknown-192.168.1.17,Linux,192.168.1.17,1,,ntl_monitor
+8,Unknown-192.168.1.194,Linux,192.168.1.194,1,,ntl_monitor
+9,BOX-FREE,Linux,192.168.1.254,1,,ntl_monitor
+10,thunderwarmachine,Linux,192.168.1.62,1,,root
+11,prox2,Linux,192.168.1.63,1,,root
+12,Win-srv,Windows,192.168.1.11,1,,ntl_monitor

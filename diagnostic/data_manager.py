@@ -18,16 +18,13 @@ def get_db_data():
         SELECT 
             e.Nom, 
             e.IPv4, 
-            eol.OS, 
-            eol.Version, 
+            e.OS,             -- On prend l'OS directement ici
             r.CPU_Percent, 
             r.RAM_Usage_Percent, 
             r.uptime, 
             s.Nom as Site
         FROM Equipements e
-        LEFT JOIN EndOfLife eol ON e.ID_EOL = eol.ID
         LEFT JOIN Sites s ON e.ID_Site = s.ID
-        -- Jointure sur la dernière entrée de ressources uniquement
         LEFT JOIN UtilisationRessources r ON r.ID = (
             SELECT MAX(ID) 
             FROM UtilisationRessources 

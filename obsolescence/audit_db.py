@@ -11,9 +11,9 @@ def fetch_assets_from_db():
 
     try:
         conn = mysql.connector.connect(
-            host="127.0.0.1",
-            user="root",
-            password="",
+            host="192.168.1.137",
+            user="admin_ntl",
+            password="Formation2025",
             database="mspr"
         )
 

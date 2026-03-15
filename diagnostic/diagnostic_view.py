@@ -8,27 +8,32 @@ def draw_header(stdscr, tabs, active_tab, w):
         stdscr.addstr(1, 2 + (i * 22), tab_name, style)
 
 def draw_diagnostic_table(stdscr, data, search_text, selected_row, h, w):
-    """Dessine uniquement le tableau de l'onglet Général adapté à la nouvelle BDD."""
+    """Dessine le tableau de diagnostic avec l'OS de la table Equipements."""
+    
     # 1. Barre de recherche
     stdscr.attrset(0)
     stdscr.addstr(3, 2, "RECHERCHE : ", curses.A_BOLD)
     stdscr.addstr(3, 15, search_text + "_", curses.color_pair(2))
 
-    # 2. Configuration des colonnes (Ajustées pour la lisibilité)
-    col_nom, col_ip = int(w * 0.15), int(w * 0.14)
-    col_os, col_ver = int(w * 0.10), int(w * 0.10)
-    col_cpu, col_ram = int(w * 0.08), int(w * 0.08)
-    col_up, col_site = int(w * 0.14), int(w * 0.12)
+    # 2. Configuration des colonnes (Ajustées : suppression VER, gain de place OS/NOM)
+    col_nom = int(w * 0.18)
+    col_ip  = int(w * 0.14)
+    col_os  = int(w * 0.16)  # Augmenté pour bien voir Windows/Linux
+    col_cpu = int(w * 0.08)
+    col_ram = int(w * 0.08)
+    col_up  = int(w * 0.16)
+    col_site = int(w * 0.14)
 
     def fmt(text, size, last=False):
         t = str(text) if text is not None and text != "" else "N/A"
+        # On tronque si c'est trop long pour la colonne
         content = t[:size-2].ljust(size-1)
         return content if last else f"{content}|"
 
-    # 3. En-tête (MAJ des noms)
+    # 3. En-tête (MAJ : Suppression de Version)
     header = (f"{fmt('NOM', col_nom)}{fmt('IP', col_ip)}{fmt('OS', col_os)}"
-              f"{fmt('VER.', col_ver)}{fmt('CPU %', col_cpu)}"
-              f"{fmt('RAM %', col_ram)}{fmt('UPTIME', col_up)}{fmt('SITE', col_site, True)}")
+              f"{fmt('CPU %', col_cpu)}{fmt('RAM %', col_ram)}"
+              f"{fmt('UPTIME', col_up)}{fmt('SITE', col_site, True)}")
     
     stdscr.attron(curses.A_UNDERLINE | curses.color_pair(3))
     try:
@@ -36,29 +41,28 @@ def draw_diagnostic_table(stdscr, data, search_text, selected_row, h, w):
     except curses.error: pass
     stdscr.attroff(curses.A_UNDERLINE | curses.color_pair(3))
 
-    # 4. Données
+    # 4. Affichage des données
     y_offset = 6
     for i, srv in enumerate(data):
         if y_offset < h - 2:
-            # Récupération des nouvelles clés de la BDD
+            # Récupération des valeurs numériques pour le style
             cpu_val = srv.get('CPU_Percent') or 0
             ram_val = srv.get('RAM_Usage_Percent') or 0
             
-            # Formatage de la ligne avec les nouvelles clés
+            # Formatage de la ligne (On utilise srv.get('OS') qui vient de Equipements)
             line_str = (f"{fmt(srv.get('Nom'), col_nom)}"
                         f"{fmt(srv.get('IPv4'), col_ip)}"
                         f"{fmt(srv.get('OS'), col_os)}"
-                        f"{fmt(srv.get('Version'), col_ver)}"
                         f"{fmt(str(cpu_val)+'%', col_cpu)}"
-                        f"{fmt(str(ram_val)+'%', col_ram)}" # Changé de 'G' à '%'
+                        f"{fmt(str(ram_val)+'%', col_ram)}"
                         f"{fmt(srv.get('uptime'), col_up)}"
                         f"{fmt(srv.get('Site'), col_site, True)}")
 
-            # Style : Rouge (color_pair 4) si CPU > 80% ou RAM > 90%
+            # Détermination du style de la ligne
             if i == selected_row:
                 style = curses.color_pair(2) | curses.A_REVERSE
             elif cpu_val > 80 or ram_val > 90:
-                style = curses.color_pair(4) | curses.A_BOLD
+                style = curses.color_pair(4) | curses.A_BOLD  # Alerte ressources
             else:
                 style = 0
 
