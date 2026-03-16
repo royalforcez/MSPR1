@@ -1,6 +1,7 @@
 import curses
 from home import screen_home
 from ui import loading_screen   # <-- on importe la loading bar
+from session_manager import ask_credentials
 
 def main(stdscr):
     curses.curs_set(0)
@@ -13,6 +14,8 @@ def main(stdscr):
 
     # Barre de chargement au démarrage
     loading_screen(stdscr)
+
+    ask_credentials(stdscr)
 
     # Lancement de l'interface principale
     screen_home(stdscr)

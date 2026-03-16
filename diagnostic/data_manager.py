@@ -1,15 +1,10 @@
 import mysql.connector
+from session_manager import DB_NTL  # On importe le dictionnaire global
 
 def get_db_data():
     """Récupère les données consolidées selon le nouveau schéma MariaDB."""
     try:
-        conn = mysql.connector.connect(
-            host="192.168.1.137",
-            user="admin_ntl",
-            password="Formation2025",
-            database="ntlsystools",
-            connect_timeout=2  # Augmenté légèrement pour la stabilité
-        )
+        conn = mysql.connector.connect(**DB_NTL)
         
         cursor = conn.cursor(dictionary=True)
         
@@ -43,13 +38,8 @@ def get_db_data():
 def check_db_health():
     """Vérifie si le serveur MariaDB répond."""
     try:
-        conn = mysql.connector.connect(
-            host="192.168.1.137",
-            user="admin_ntl",
-            password="Formation2025",
-            database="ntlsystools",
-            connect_timeout=1
-        )
+        conn = mysql.connector.connect(**DB_NTL)
+
         if conn.is_connected():
             cursor = conn.cursor()
             cursor.execute("SELECT 1")

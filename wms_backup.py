@@ -4,42 +4,28 @@ import csv
 import os
 import smbclient
 from datetime import datetime
+from session_manager import DB_NTL, DB_ENTREPRISE, NAS_CONFIG
 
 # =========================================================
 # CONFIGURATIONS
 # =========================================================
 
 def get_available_databases():
-    """ Liste des bases de données disponibles avec leurs configs respectives """
+    """Permet de garder la flexibilité mais utilise les pass de session"""
     return [
         {
-            "display": "💻 BASE DE DONNÉES TP (ntlsystools)",  # base de donnée ntl
-            "config": {
-                "host": "192.168.1.137",
-                "user": "admin_ntl",
-                "password": "Formation2025",
-                "database": "ntlsystools"
-            }
+            "display": f"💻 BASE NTL (TP) - {DB_NTL['host']}",
+            "config": DB_NTL
         },
         {
-            "display": "🏢 BASE DE DONNÉES ENTREPRISE (prod_wms)", # base de donnéee de l'entreprise
-            "config": {
-                "host": "127.0.0.1", # À modifier si l'IP est différente
-                "user": "root",
-                "password": "",
-                "database": "prod_wms"
-            }
+            "display": f"🏢 BASE ENTREPRISE (PROD) - {DB_ENTREPRISE['host']}",
+            "config": DB_ENTREPRISE
         }
     ]
 
 def get_nas_config():
-    """ Configuration pour le NAS de Lille """
-    return {
-        "ip": "192.168.1.11", # ip du nas à rensigner 
-        "user": "admin_ntl", # identifiant à rensigner
-        "password": "Formation2025",
-        "share": "NAS-Lille" # non du folder partager par le nas
-    }
+    """Utilise désormais les infos saisies au démarrage"""
+    return NAS_CONFIG
 
 # =========================================================
 # LOGIQUE DE SAUVEGARDE ET TRANSFERT

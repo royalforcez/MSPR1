@@ -1,21 +1,14 @@
 import mysql.connector
 from .models import Asset
-
+from session_manager import DB_NTL  # On importe la config saisie au démarrage
 
 def fetch_assets_from_db():
     """
-    Récupère les machines depuis la base MySQL.
-    Si la connexion échoue, une exception propre est renvoyée
-    pour être gérée par l'interface curses.
+    Récupère les machines depuis la base MySQL en utilisant la session active.
     """
-
     try:
-        conn = mysql.connector.connect(
-            host="192.168.1.137",
-            user="admin_ntl",
-            password="Formation2025",
-            database="ntlsystools"
-        )
+        # On utilise **DB_NTL pour injecter host, user, password, database
+        conn = mysql.connector.connect(**DB_NTL)
 
     except mysql.connector.Error as err:
         raise RuntimeError(f"Connexion MySQL impossible : {err}")
@@ -30,15 +23,11 @@ def fetch_assets_from_db():
     """)
 
     rows = cur.fetchall()
-
     conn.close()
 
     assets = []
-
     for row in rows:
-
         hostname, ip, os_name, os_version = row
-
         assets.append(
             Asset(
                 hostname,
