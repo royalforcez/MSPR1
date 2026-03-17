@@ -4,7 +4,7 @@ from core.scanner import run_network_scan
 from core.monitoring import run_system_monitoring
 
 # Configuration des intervalles (en secondes)
-INTERVAL_MONITORING = 300    # 5 minutes
+INTERVAL_MONITORING = 60    # 5 minutes
 INTERVAL_SCAN = 604800       # 7 jours
 
 def main():

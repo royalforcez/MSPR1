@@ -132,6 +132,11 @@ def run_system_monitoring():
         status = check_port(eq['ipv4'], 22)
         insert_service_status(eq['id'], 'Serveur (SSH)', status)
         
+        # Variable pour déterminer si on doit lancer les tests AD/DNS
+        check_ad_dns = False
+        # Nom de la machine en base de données (sécurité si le SSH est DOWN)
+        nom_machine_bdd = eq.get('nom', '').upper()
+        
         if status == "UP":
             metrics = get_ssh_metrics(eq['ipv4'], eq['ssh_user'])
             if metrics:
@@ -146,17 +151,27 @@ def run_system_monitoring():
                 insert_metrics(eq['id'], metrics['cpu'], metrics['ram'], metrics['disk'], metrics['uptime'])
                 print(f"    [OK] Metrics collectées pour {metrics['host']}")
                 
-                # === 2. VERIFICATION DNS ET AD ===
+                # On détermine avec les métriques SSH s'il faut checker l'AD/DNS
                 nom_machine = metrics['host'].upper()
                 if metrics['os_type'] == "WINDOWS" or "DC" in nom_machine or "AD" in nom_machine or "DNS" in nom_machine:
-                    print(f"    -> Test des services AD/DNS pour {metrics['host']}...")
-                    
-                    etat_dns = check_dns(eq['ipv4'])
-                    insert_service_status(eq['id'], 'DNS', etat_dns)
-                    
-                    etat_ad = check_ad(eq['ipv4'], ad_domain, ad_user, ad_pass)
-                    insert_service_status(eq['id'], 'Active Directory', etat_ad)
+                    check_ad_dns = True
             else:
                 print(f"    [!] Erreur SSH (Clé/Auth) sur {eq['nom']} ({eq['ipv4']})")
+                # Fallback : Si echec SSH mais qu'on sait que c'est du Windows via le nom BDD
+                if "WIN" in nom_machine_bdd or "DC" in nom_machine_bdd or "AD" in nom_machine_bdd or "DNS" in nom_machine_bdd:
+                    check_ad_dns = True
         else:
             print(f"    [X] {eq['nom']} est injoignable (Port 22 fermé)")
+            # Fallback : Si SSH est DOWN, on se fie au nom BDD pour quand même tester l'AD/DNS
+            if "WIN" in nom_machine_bdd or "DC" in nom_machine_bdd or "AD" in nom_machine_bdd or "DNS" in nom_machine_bdd:
+                check_ad_dns = True
+
+        # === 2. VERIFICATION DNS ET AD (Maintenant indépendante du SSH) ===
+        if check_ad_dns:
+            print(f"    -> Test des services AD/DNS pour {eq['nom']} ({eq['ipv4']})...")
+            
+            etat_dns = check_dns(eq['ipv4'])
+            insert_service_status(eq['id'], 'DNS', etat_dns)
+            
+            etat_ad = check_ad(eq['ipv4'], ad_domain, ad_user, ad_pass)
+            insert_service_status(eq['id'], 'Active Directory', etat_ad)
