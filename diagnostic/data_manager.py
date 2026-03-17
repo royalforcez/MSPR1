@@ -2,12 +2,10 @@ import mysql.connector
 from session_manager import DB_NTL  
 
 def get_db_data():
-    """Récupère les données consolidées selon le nouveau schéma MariaDB."""
+    """Récupère les données consolidées incluant le disque."""
     try:
         conn = mysql.connector.connect(**DB_NTL)
-        
         cursor = conn.cursor(dictionary=True)
-        
         
         query = """
         SELECT 
@@ -16,6 +14,7 @@ def get_db_data():
             o.nom_os AS OS,            
             r.CPU_Percent, 
             r.RAM_Usage_Percent, 
+            r.disk_usage_percent, 
             r.uptime, 
             s.Nom as Site
         FROM tb_equipements e
