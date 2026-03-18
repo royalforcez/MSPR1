@@ -1,3 +1,6 @@
 __pycache__/
+__pycache__/*
 outputs/
 outputs/*
+backups/csv/*
+backups/sql/*
