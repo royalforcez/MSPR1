@@ -1,5 +1,5 @@
 import mysql.connector
-from session_manager import DB_NTL  
+from session_manager import DB_NTL, DB_ENTREPRISE
 
 def get_db_data():
     """Récupère les données consolidées incluant le disque."""
@@ -37,24 +37,31 @@ def get_db_data():
         return f"Erreur de lecture : {str(e)}"
 
 def check_db_health():
-    """Vérifie si le serveur MariaDB répond."""
-    try:
-        conn = mysql.connector.connect(**DB_NTL)
+    """Vérifie le statut des deux bases de données."""
+    results = {
+        "ntl": (False, "Injoignable"),
+        "entreprise": (False, "Injoignable")
+    }
 
+    # Test NTL
+    try:
+        conn = mysql.connector.connect(**DB_NTL, connect_timeout=2)
         if conn.is_connected():
-            cursor = conn.cursor()
-            cursor.execute("SELECT 1")
-            cursor.fetchone()
-            cursor.execute("SHOW TABLES LIKE 'tb_equipements'")
-            exists = cursor.fetchone()
+            results["ntl"] = (True, "ONLINE (ntlsystools)")
             conn.close()
-            
-            if exists:
-                return True, "MariaDB OK (Base ntlsystools prête)"
-            else:
-                return False, "MariaDB Connecté mais tables manquantes"
     except Exception as e:
-        return False, f"SQL Injoignable : {str(e)}"
+        results["ntl"] = (False, f"Erreur : {str(e)[:20]}")
+
+    # Test ENTREPRISE
+    try:
+        conn = mysql.connector.connect(**DB_ENTREPRISE, connect_timeout=2)
+        if conn.is_connected():
+            results["entreprise"] = (True, f"ONLINE ({DB_ENTREPRISE['database']})")
+            conn.close()
+    except Exception as e:
+        results["entreprise"] = (False, f"Erreur : {str(e)[:20]}")
+
+    return results
 
 def get_services_data():
     """Récupère le dernier état AD/DNS, trié par nom de serveur (ex: DC01, DC02)."""
