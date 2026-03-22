@@ -12,6 +12,7 @@ from core.ssh_windows import get_windows_metrics
 load_dotenv()
 
 def check_port(ip, port):
+    """Vérifie si un port TCP spécifique est ouvert sur une IP donnée."""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(2)
     try:
@@ -64,39 +65,50 @@ def run_system_monitoring(check_type="all"):
     for eq in equipments:
         status = check_port(eq['ipv4'], 22)
         
-        # On ne met à jour l'état du service SSH et AD/DNS que lors d'un check fréquent (cpu_ram) ou global
+        # On ne met à jour l'état du service SSH que lors d'un check fréquent (cpu_ram) ou global
         if check_type in ["all", "cpu_ram"]:
             insert_service_status(eq['id'], 'Serveur (SSH)', status)
         
+        # Initialisation des drapeaux de vérification des services
         check_ad_dns = False
+        check_bdd = False
         nom_machine_bdd = eq.get('nom', '').upper()
         
         if status == "UP":
             metrics = get_ssh_metrics(eq['ipv4'], eq['ssh_user'], check_type)
             if metrics:
-                # On ne fait les updates BDD de l'OS et du Serial Number que lors des checks CPU (fréquents) 
-                # pour ne pas surcharger la base de données inutilement lors du check disque.
                 if check_type in ["all", "cpu_ram"]:
                     id_os = get_or_create_os(metrics['os_name'], metrics['os_version'])
                     update_equipment_info(eq['id'], metrics['host'], metrics['sn'], id_os)
                 
-                # Insertion des métriques (La BDD recevra 0 pour les métriques non demandées par le check_type)
                 insert_metrics(eq['id'], metrics['cpu'], metrics['ram'], metrics['disk'], metrics['uptime'])
                 print(f"    [OK] Metrics poussées pour {metrics['host']} (Mode: {check_type})")
                 
                 nom_machine = metrics['host'].upper()
+                
+                # Détection des mots clés via le hostname réel
                 if metrics['os_type'] == "WINDOWS" or "DC" in nom_machine or "AD" in nom_machine or "DNS" in nom_machine:
                     check_ad_dns = True
+                if "BDD" in nom_machine:
+                    check_bdd = True
             else:
                 if check_type in ["all", "cpu_ram"]:
                     print(f"    [!] Impossible de récupérer les métriques de {nom_machine_bdd} ({eq['ipv4']})")
+                
+                # Détection de secours via le nom en base de données (si SSH échoue)
                 if "WIN" in nom_machine_bdd or "DC" in nom_machine_bdd or "AD" in nom_machine_bdd or "DNS" in nom_machine_bdd:
                     check_ad_dns = True
+                if "BDD" in nom_machine_bdd:
+                    check_bdd = True
         else:
             if check_type in ["all", "cpu_ram"]:
                 print(f"    [ERR-1001] SSH Fail : {nom_machine_bdd} est injoignable (Port 22 fermé sur {eq['ipv4']})")
+            
+            # Détection de secours via le nom en base de données
             if "WIN" in nom_machine_bdd or "DC" in nom_machine_bdd or "AD" in nom_machine_bdd or "DNS" in nom_machine_bdd:
                 check_ad_dns = True
+            if "BDD" in nom_machine_bdd:
+                check_bdd = True
 
         # === VERIFICATION DNS ET AD ===
         if check_ad_dns and check_type in ["all", "cpu_ram"]:
@@ -111,3 +123,16 @@ def run_system_monitoring(check_type="all"):
             if etat_ad == "DOWN":
                 print(f"        [ERR-2002] Service Fail : Connexion Active Directory (LDAP) refusée sur {eq['ipv4']}")
             insert_service_status(eq['id'], 'Active Directory', etat_ad)
+
+        # === VERIFICATION BASE DE DONNÉES (NOUVEAU) ===
+        if check_bdd and check_type in ["all", "cpu_ram"]:
+            print(f"    -> Test du service BDD (MySQL) pour {nom_machine_bdd} ({eq['ipv4']})...")
+            
+            # On vérifie si le port 3306 (MySQL/MariaDB) est ouvert et répond
+            etat_bdd = check_port(eq['ipv4'], 3306)
+            
+            if etat_bdd == "DOWN":
+                print(f"        [ERR-2003] Service Fail : Le service MySQL (port 3306) ne répond pas sur {eq['ipv4']}")
+            
+            # On insère le statut en BDD
+            insert_service_status(eq['id'], 'Base de Données', etat_bdd)
