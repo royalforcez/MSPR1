@@ -3,6 +3,7 @@ import mysql.connector
 import csv
 import os
 import smbclient
+import time
 from datetime import datetime
 from session_manager import DB_NTL, DB_ENTREPRISE, NAS_CONFIG
 
@@ -11,20 +12,12 @@ from session_manager import DB_NTL, DB_ENTREPRISE, NAS_CONFIG
 # =========================================================
 
 def get_available_databases():
-    """Permet de garder la flexibilité mais utilise les pass de session"""
     return [
-        {
-            "display": f"💻 BASE NTL (TP) - {DB_NTL['host']}",
-            "config": DB_NTL
-        },
-        {
-            "display": f"🏢 BASE ENTREPRISE (PROD) - {DB_ENTREPRISE['host']}",
-            "config": DB_ENTREPRISE
-        }
+        {"display": f"💻 BASE NTL (TP) - {DB_NTL['host']}", "config": DB_NTL},
+        {"display": f"🏢 BASE ENTREPRISE (PROD) - {DB_ENTREPRISE['host']}", "config": DB_ENTREPRISE}
     ]
 
 def get_nas_config():
-    """Utilise désormais les infos saisies au démarrage"""
     return NAS_CONFIG
 
 # =========================================================
@@ -44,25 +37,76 @@ def save_to_nas(local_file_path):
     except Exception as e:
         return False, str(e)
 
-def backup_db_to_sql(db_config):
+def backup_db_to_sql(db_config, stdscr=None):
+    """Sauvegarde complète avec retour visuel sur stdscr"""
     backup_dir = "backups/sql"
-    if not os.path.exists(backup_dir): os.makedirs(backup_dir)
+    if not os.path.exists(backup_dir): 
+        os.makedirs(backup_dir)
+    
     filename = f"{backup_dir}/backup_{db_config['database']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.sql"
+    spinner = ["|", "/", "-", "\\"]
     
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
+        
         cursor.execute("SHOW TABLES")
         tables = [row[0] for row in cursor.fetchall()]
-        
+        total_tables = len(tables)
+
         with open(filename, 'w', encoding='utf-8') as f:
-            f.write(f"-- Backup SQL Automatique\n-- Base: {db_config['database']}\n\n")
-            for table in tables:
+            # Entête propre pour éviter les erreurs de syntaxe à l'import
+            f.write(f"-- Backup SQL Complet\n-- Base : {db_config['database']}\n")
+            f.write("SET FOREIGN_KEY_CHECKS = 0;\n")
+            f.write("SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';\n\n")
+
+            for index, table in enumerate(tables):
+                # --- MISE À JOUR VISUELLE ---
+                if stdscr:
+                    percent = int((index / total_tables) * 100)
+                    stdscr.move(10, 4)
+                    stdscr.clrtoeol()
+                    stdscr.addstr(10, 4, f"📊 Progression : [{percent}%] Traitement de : {table}...", curses.color_pair(3))
+                    stdscr.refresh()
+
+                # --- STRUCTURE ---
                 cursor.execute(f"SHOW CREATE TABLE `{table}`")
-                f.write(f"DROP TABLE IF EXISTS `{table}`;\n{cursor.fetchone()[1]};\n\n")
+                create_table_sql = cursor.fetchone()[1]
+                f.write(f"DROP TABLE IF EXISTS `{table}`;\n{create_table_sql};\n\n")
+                
+                # --- DONNÉES ---
+                cursor.execute(f"SELECT * FROM `{table}`")
+                rows = cursor.fetchall()
+                
+                if rows:
+                    column_names = [i[0] for i in cursor.description]
+                    cols_str = "`,`".join(column_names)
+                    
+                    for r_idx, row in enumerate(rows):
+                        # Animation spinner pour les grosses tables
+                        if stdscr and r_idx % 50 == 0:
+                            stdscr.addstr(10, 60, f" {spinner[r_idx // 50 % 4]}")
+                            stdscr.refresh()
+
+                        values = []
+                        for val in row:
+                            if val is None: values.append("NULL")
+                            elif isinstance(val, (int, float)): values.append(str(val))
+                            elif hasattr(val, 'isoformat'): values.append(f"'{val}'")
+                            else:
+                                clean_val = str(val).replace("'", "''").replace("\\", "\\\\")
+                                values.append(f"'{clean_val}'")
+                        
+                        f.write(f"INSERT INTO `{table}` (`{cols_str}`) VALUES ({', '.join(values)});\n")
+                    f.write("\n")
+
+            f.write("SET FOREIGN_KEY_CHECKS = 1;\n")
+            
         conn.close()
         return True, filename
+
     except Exception as e:
+        if 'conn' in locals() and conn.is_connected(): conn.close()
         return False, str(e)
 
 def export_table_to_csv(table_name, db_config):
@@ -85,34 +129,26 @@ def export_table_to_csv(table_name, db_config):
         return False, str(e)
 
 # =========================================================
-# INTERFACES DE SÉLECTION (POP-UPS)
+# INTERFACES
 # =========================================================
 
 def select_database_prompt(stdscr):
-    """ Demande à l'utilisateur quelle BDD utiliser au démarrage du module """
     dbs = get_available_databases()
     h, w = stdscr.getmaxyx()
-    win_h, win_w = 10, 60
+    win_h, win_w = 10, 65
     start_y, start_x = (h - win_h) // 2, (w - win_w) // 2
-    
     win = curses.newwin(win_h, win_w, start_y, start_x)
-    win.box()
-    win.keypad(True)
+    win.box(); win.keypad(True)
     
     choice = 0
     while True:
         win.attron(curses.color_pair(3))
-        win.addstr(1, (win_w - 28) // 2, " SÉLECTION DE LA BASE DE DONNÉES ", curses.A_BOLD)
+        win.addstr(1, (win_w - 32) // 2, " SÉLECTION DE LA SOURCE SQL ", curses.A_BOLD)
         win.attroff(curses.color_pair(3))
-        win.addstr(3, 2, "Quelle base souhaitez-vous auditer / sauvegarder ?")
         
         for i, db in enumerate(dbs):
-            if i == choice:
-                win.attron(curses.color_pair(2) | curses.A_REVERSE)
-                win.addstr(5 + i, 4, f" {db['display']} ")
-                win.attroff(curses.color_pair(2) | curses.A_REVERSE)
-            else:
-                win.addstr(5 + i, 4, f" {db['display']} ")
+            style = curses.color_pair(2) | curses.A_REVERSE if i == choice else curses.A_NORMAL
+            win.addstr(4 + i, 4, f" {db['display']} ", style)
         
         win.refresh()
         key = win.getch()
@@ -132,12 +168,8 @@ def ask_destination(stdscr):
     while True:
         win.addstr(1, (win_w - 22) // 2, " DESTINATION DU FLUX ", curses.color_pair(3) | curses.A_BOLD)
         for i, opt in enumerate(options):
-            if i == choice:
-                win.attron(curses.color_pair(2) | curses.A_REVERSE)
-                win.addstr(5 + i, 4, opt)
-                win.attroff(curses.color_pair(2) | curses.A_REVERSE)
-            else:
-                win.addstr(5 + i, 4, opt)
+            style = curses.color_pair(2) | curses.A_REVERSE if i == choice else curses.A_NORMAL
+            win.addstr(4 + i, 4, opt, style)
         win.refresh()
         key = win.getch()
         if key == curses.KEY_UP: choice = 0
@@ -146,21 +178,16 @@ def ask_destination(stdscr):
         elif key == 27: return None
 
 # =========================================================
-# MODULE PRINCIPAL WMS
+# MODULE PRINCIPAL
 # =========================================================
 
 def screen_wms_backup(stdscr):
-    # --- ÉTAPE 1 : Choix de la BDD avant toute chose ---
     selected_db_config = select_database_prompt(stdscr)
-    if not selected_db_config: return # Retour au menu principal si ESC
+    if not selected_db_config: return 
 
-    # --- ÉTAPE 2 : Chargement des tables de la BDD choisie ---
     stdscr.clear()
-    
-    # AJOUTE CETTE LIGNE ICI POUR FIXER L'ERREUR :
     h, w = stdscr.getmaxyx() 
-    
-    stdscr.addstr(h//2, (w-30)//2, f"⏳ Chargement de {selected_db_config['database']}...", curses.color_pair(3))
+    stdscr.addstr(h//2, (w-30)//2, "⏳ Connexion à la base...", curses.color_pair(3))
     stdscr.refresh()
     
     all_tables = []
@@ -171,33 +198,21 @@ def screen_wms_backup(stdscr):
         all_tables = [row[0] for row in cursor.fetchall()]
         conn.close()
     except Exception as e:
-        # Gérer l'erreur si la BDD n'est pas accessible
-        stdscr.clear()
-        stdscr.addstr(5, 4, f"❌ Impossible de se connecter à {selected_db_config['database']}", curses.color_pair(1))
-        stdscr.addstr(6, 4, str(e))
-        stdscr.getch()
-        return
+        stdscr.addstr(h//2 + 2, 4, f"❌ Erreur : {str(e)}", curses.color_pair(1))
+        stdscr.getch(); return
 
     current = 0
     while True:
         stdscr.clear()
         h, w = stdscr.getmaxyx()
-        
-        # Rappel de la BDD active dans le titre
         title = f"SAUVEGARDES : {selected_db_config['database'].upper()}"
-        stdscr.attron(curses.color_pair(3) | curses.A_BOLD)
-        stdscr.addstr(2, (w - len(title)) // 2, title)
-        stdscr.attroff(curses.color_pair(3) | curses.A_BOLD)
+        stdscr.addstr(2, (w - len(title)) // 2, title, curses.color_pair(3) | curses.A_BOLD)
 
-        MODULES = ["SAUVEGARDE COMPLÈTE (SQL)"]
-        MODULES += [f"EXPORT CSV : {t}" for t in all_tables]
-        MODULES.append("RETOUR / CHANGER DE BDD")
+        MODULES = ["SAUVEGARDE COMPLÈTE (SQL + DATA)"] + [f"CSV : {t}" for t in all_tables] + ["RETOUR"]
 
         for i, module in enumerate(MODULES):
             if i == current:
-                stdscr.attron(curses.color_pair(2) | curses.A_BOLD)
-                stdscr.addstr(6 + i, 4, f"> {module}")
-                stdscr.attroff(curses.color_pair(2) | curses.A_BOLD)
+                stdscr.addstr(6 + i, 4, f"> {module}", curses.color_pair(2) | curses.A_BOLD)
             else:
                 stdscr.addstr(6 + i, 4, f"  {module}")
 
@@ -206,7 +221,6 @@ def screen_wms_backup(stdscr):
 
         if key == curses.KEY_UP and current > 0: current -= 1
         elif key == curses.KEY_DOWN and current < len(MODULES) - 1: current += 1
-        
         elif key in (10, 13):
             if current == len(MODULES) - 1: return 
 
@@ -214,31 +228,28 @@ def screen_wms_backup(stdscr):
             if not dest: continue
 
             stdscr.clear()
-            stdscr.addstr(5, 4, "⏳ Traitement en cours...", curses.color_pair(3))
+            stdscr.addstr(5, 4, "⏳ INITIALISATION...", curses.color_pair(3))
             stdscr.refresh()
 
-            # On passe la config sélectionnée aux fonctions
             if current == 0:
-                success, path = backup_db_to_sql(selected_db_config)
+                # APPEL AVEC STDSCR POUR LA BARRE DE PROGRESSION
+                success, path = backup_db_to_sql(selected_db_config, stdscr)
             else:
-                success, path = export_table_to_csv(all_tables[current - 1], selected_db_config)
+                table_name = all_tables[current - 1]
+                stdscr.addstr(7, 4, f"📄 Exportation CSV : {table_name}...")
+                stdscr.refresh()
+                success, path = export_table_to_csv(table_name, selected_db_config)
 
             if success and dest == "nas":
-                stdscr.addstr(7, 4, "📡 Envoi vers le NAS de Lille...")
+                stdscr.addstr(12, 4, "📡 Envoi vers le NAS...", curses.color_pair(3))
                 stdscr.refresh()
                 nas_ok, nas_res = save_to_nas(path)
                 if nas_ok: path = nas_res
                 else: success = False; path = f"Erreur NAS: {nas_res}"
 
-            stdscr.move(10, 0)
-            if success:
-                stdscr.addstr(10, 4, f"✅ RÉUSSI ({dest.upper()})", curses.color_pair(2))
-                stdscr.addstr(11, 4, f"Fichier : {os.path.basename(path)}")
-            else:
-                stdscr.addstr(10, 4, "❌ ÉCHEC", curses.color_pair(1))
-                stdscr.addstr(11, 4, str(path))
-            
-            stdscr.addstr(13, 4, "Appuyez sur une touche...")
+            # Résultat
+            stdscr.addstr(15, 4, "✅ RÉUSSI" if success else "❌ ÉCHEC", curses.color_pair(2 if success else 1) | curses.A_BOLD)
+            stdscr.addstr(16, 4, f"Fichier : {path}")
+            stdscr.addstr(18, 4, "Appuyez sur une touche...")
             stdscr.getch()
-
         elif key == 27: return

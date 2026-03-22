@@ -73,10 +73,7 @@ def draw_services_interface(stdscr, h, w, db_status, services_data):
             draw_box_line(y_offset, "")
             y_offset += 1
 
+
     stdscr.addstr(y_offset, 2, "╚" + "═" * (box_width - 2) + "╝")
 
-    y_offset += 2
-    if y_offset < h - 2:
-        btn_text = "   [ EXPORTER LES DONNÉES EN JSON ]   "
-        x_pos = max(2, (w - len(btn_text)) // 2)
-        stdscr.addstr(y_offset, x_pos, btn_text, curses.A_REVERSE | curses.A_BOLD)
+

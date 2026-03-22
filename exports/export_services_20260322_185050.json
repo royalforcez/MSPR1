@@ -1,0 +1,14 @@
+{
+    "view": "Services",
+    "db_status": {
+        "ntl": [
+            false,
+            "Erreur : 1045 (28000): Accès "
+        ],
+        "entreprise": [
+            false,
+            "Erreur : 1045 (28000): Accès "
+        ]
+    },
+    "data": {}
+}
