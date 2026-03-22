@@ -6,7 +6,7 @@ from obsolescence import screen_obsolescence_audit
 
 MODULES = [
     "1. Module Diagnostic",
-    "2. Module Sauvegarde WMS",
+    "2. Module Sauvegarde WMS/NTL",
     "3. Module Audit d’Obsolescence",
     "Q. Quitter"
 ]
