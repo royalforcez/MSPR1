@@ -135,4 +135,4 @@ def run_system_monitoring(check_type="all"):
                 print(f"        [ERR-2003] Service Fail : Le service MySQL (port 3306) ne répond pas sur {eq['ipv4']}")
             
             # On insère le statut en BDD
-            insert_service_status(eq['id'], 'Base de Données', etat_bdd)
+            insert_service_status(eq['id'], 'BDD-MySQL', etat_bdd)
