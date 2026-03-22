@@ -6,7 +6,7 @@ DB_NTL = {
 }
 
 DB_ENTREPRISE = {
-    "host": "", "user": "", "password": "", "database": "ntlsystools"
+    "host": "", "user": "", "password": "", "database": "wms_db"
 }
 
 NAS_CONFIG = {
