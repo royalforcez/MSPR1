@@ -1,4 +1,5 @@
 import curses
+import ipaddress
 from datetime import datetime
 from .eol_api import EOLClient
 from .audit_db import fetch_assets_from_db
@@ -9,6 +10,7 @@ from .reports import write_report_csv, write_report_json
 
 MODULES = [
     "Lister les versions d’un OS et leurs dates de fin de vie",
+    "Lister les composants d’une plage réseau",
     "Lancer un audit depuis la base de données",
     "Lancer un audit depuis un fichier CSV",
     "Exporter le résultat du dernier audit",
@@ -16,10 +18,11 @@ MODULES = [
 ]
 
 
+# =====================================================
+# STATUT EOL
+# =====================================================
+
 def get_status(eol_date):
-    """
-    Détermine le statut d'un OS selon sa date de fin de vie.
-    """
 
     if not eol_date or eol_date == "N/A":
         return "INCONNU"
@@ -43,21 +46,15 @@ def get_status(eol_date):
 
 
 def extract_eol_date(release):
-    """
-    Gère tous les formats possibles de l'API endoflife.
-    """
 
     eol = release.get("eol")
 
-    # Cas 1 : eol = {"date": "..."}
     if isinstance(eol, dict):
         return eol.get("date", "N/A")
 
-    # Cas 2 : eol = "2025-07-10"
     if isinstance(eol, str):
         return eol
 
-    # Cas 3 : autres champs possibles
     return (
         release.get("eolFrom")
         or release.get("eolDate")
@@ -66,11 +63,45 @@ def extract_eol_date(release):
     )
 
 
+# =====================================================
+# FILTRAGE RESEAU (CIDR STRICT)
+# =====================================================
+
+def get_assets_in_network(network_cidr, assets):
+    """
+    Filtrage strict basé sur CIDR
+    ex: 192.168.1.0/24
+    """
+
+    try:
+        network = ipaddress.ip_network(network_cidr, strict=False)
+    except ValueError:
+        raise ValueError("Format invalide (ex: 192.168.1.0/24)")
+
+    filtered = []
+
+    for asset in assets:
+        try:
+            if asset.ip:
+                ip_obj = ipaddress.ip_address(asset.ip)
+
+                if ip_obj in network:
+                    filtered.append(asset)
+
+        except ValueError:
+            continue
+
+    return filtered
+
+
+# =====================================================
+# INTERFACE PRINCIPALE
+# =====================================================
+
 def screen_obsolescence_audit(stdscr):
 
     client = EOLClient()
     last_results = []
-
     current = 0
 
     while True:
@@ -109,7 +140,6 @@ def screen_obsolescence_audit(stdscr):
         stdscr.addstr(h - 1, (w - len(footer)) // 2, footer)
 
         stdscr.refresh()
-
         key = stdscr.getch()
 
         if key == curses.KEY_UP and current > 0:
@@ -121,7 +151,7 @@ def screen_obsolescence_audit(stdscr):
         elif key in (10, 13):
 
             # =====================================================
-            # LISTER LES VERSIONS D'UN OS
+            # 1. LISTER VERSIONS OS
             # =====================================================
             if current == 0:
 
@@ -130,34 +160,22 @@ def screen_obsolescence_audit(stdscr):
                 label = "Produit endoflife (ex: ubuntu, windows-server): "
                 stdscr.addstr(5, 4, label)
 
-                x_input = 4 + len(label)
-
-                stdscr.move(5, x_input)
-                stdscr.clrtoeol()
-
-                stdscr.refresh()
-
                 curses.echo()
-                product = stdscr.getstr(5, x_input, 50).decode().strip()
+                product = stdscr.getstr(5, 4 + len(label), 50).decode().strip()
                 curses.noecho()
 
                 try:
-
                     releases = client.list_releases(product)
 
                     stdscr.clear()
-                    stdscr.addstr(3, 4, f"Versions connues pour {product} :")
-
+                    stdscr.addstr(3, 4, f"Versions pour {product} :")
                     stdscr.addstr(5, 4, "VERSION        EOL DATE        STATUT")
 
                     line = 7
 
                     for r in releases:
-
                         cycle = r.get("name") or r.get("cycle") or "N/A"
-
                         eol = extract_eol_date(r)
-
                         status = get_status(eol)
 
                         text = f"{cycle:<15} {eol:<15} {status}"
@@ -165,105 +183,124 @@ def screen_obsolescence_audit(stdscr):
                         if line < h - 2:
                             stdscr.addstr(line, 4, text)
                             line += 1
-                        else:
-                            break
 
                 except Exception as e:
+                    stdscr.addstr(7, 4, str(e))
 
-                    stdscr.addstr(7, 4, "Erreur lors de l'appel API")
-                    stdscr.addstr(8, 4, str(e))
-
-                stdscr.addstr(h - 2, 4, "Appuie sur une touche pour continuer")
                 stdscr.getch()
 
             # =====================================================
-            # AUDIT depuis la BDD
+            # 2. LISTE PAR RESEAU (CIDR)
             # =====================================================
             elif current == 1:
 
                 stdscr.clear()
-                stdscr.addstr(5, 4, "Audit depuis la base de données...")
-                stdscr.refresh()
+
+                label = "Réseau CIDR (ex: 192.168.1.0/24) : "
+                stdscr.addstr(5, 4, label)
+
+                curses.echo()
+                network = stdscr.getstr(5, 4 + len(label), 30).decode().strip()
+                curses.noecho()
 
                 try:
-
                     assets = fetch_assets_from_db()
+                    filtered = get_assets_in_network(network, assets)
 
-                    last_results = audit_assets(assets, client)
+                    stdscr.clear()
+                    stdscr.addstr(3, 4, f"Machines dans {network} :")
 
-                    json_path = write_report_json(last_results)
-                    csv_path = write_report_csv(last_results)
+                    stdscr.addstr(5, 4, "HOSTNAME        IP              OS              VERSION")
 
-                    stdscr.addstr(7, 4, "Audit terminé")
-                    stdscr.addstr(8, 4, f"Rapport JSON : {json_path}")
-                    stdscr.addstr(9, 4, f"Export CSV   : {csv_path}")
+                    line = 7
+
+                    for a in filtered:
+                        text = f"{a.hostname:<15} {a.ip:<15} {a.os_name:<20} {a.os_version}"
+
+                        if line < h - 2:
+                            stdscr.addstr(line, 4, text)
+                            line += 1
+
+                    if not filtered:
+                        stdscr.addstr(7, 4, "Aucun équipement trouvé.")
 
                 except Exception as e:
+                    stdscr.addstr(7, 4, str(e))
 
-                    stdscr.addstr(7, 4, "Erreur lors de la connexion à la base")
-                    stdscr.addstr(8, 4, str(e))
-
-                stdscr.addstr(10, 4, "Appuie sur une touche pour continuer")
                 stdscr.getch()
 
             # =====================================================
-            # AUDIT depuis CSV
+            # 3. AUDIT BDD
             # =====================================================
             elif current == 2:
 
                 stdscr.clear()
-                stdscr.addstr(5, 4, "Chemin du fichier CSV : ")
+                stdscr.addstr(5, 4, "Audit depuis la base...")
                 stdscr.refresh()
 
-                curses.echo()
-                path = stdscr.getstr(5, 28, 200).decode()
-                curses.noecho()
-
                 try:
-
-                    assets = read_assets_from_csv(path)
-
+                    assets = fetch_assets_from_db()
                     last_results = audit_assets(assets, client)
 
                     json_path = write_report_json(last_results)
                     csv_path = write_report_csv(last_results)
 
                     stdscr.addstr(7, 4, "Audit terminé")
-                    stdscr.addstr(8, 4, f"Rapport JSON : {json_path}")
-                    stdscr.addstr(9, 4, f"Export CSV   : {csv_path}")
+                    stdscr.addstr(8, 4, f"JSON : {json_path}")
+                    stdscr.addstr(9, 4, f"CSV  : {csv_path}")
 
                 except Exception as e:
+                    stdscr.addstr(7, 4, str(e))
 
-                    stdscr.addstr(7, 4, "Erreur lors de l'analyse du CSV")
-                    stdscr.addstr(8, 4, str(e))
-
-                stdscr.addstr(10, 4, "Appuie sur une touche pour continuer")
                 stdscr.getch()
 
             # =====================================================
-            # EXPORT CSV
+            # 4. AUDIT CSV
             # =====================================================
             elif current == 3:
+
+                stdscr.clear()
+                stdscr.addstr(5, 4, "Chemin CSV : ")
+
+                curses.echo()
+                path = stdscr.getstr(5, 20, 200).decode()
+                curses.noecho()
+
+                try:
+                    assets = read_assets_from_csv(path)
+                    last_results = audit_assets(assets, client)
+
+                    json_path = write_report_json(last_results)
+                    csv_path = write_report_csv(last_results)
+
+                    stdscr.addstr(7, 4, "Audit terminé")
+                    stdscr.addstr(8, 4, f"JSON : {json_path}")
+                    stdscr.addstr(9, 4, f"CSV  : {csv_path}")
+
+                except Exception as e:
+                    stdscr.addstr(7, 4, str(e))
+
+                stdscr.getch()
+
+            # =====================================================
+            # 5. EXPORT
+            # =====================================================
+            elif current == 4:
 
                 stdscr.clear()
 
                 if not last_results:
                     stdscr.addstr(5, 4, "Aucun audit disponible")
-
                 else:
-
                     csv_path = write_report_csv(last_results)
+                    stdscr.addstr(5, 4, f"Export CSV : {csv_path}")
 
-                    stdscr.addstr(5, 4, "Export CSV terminé")
-                    stdscr.addstr(6, 4, f"Fichier : {csv_path}")
-
-                stdscr.addstr(8, 4, "Appuie sur une touche pour continuer")
                 stdscr.getch()
 
             # =====================================================
-            # RETOUR
+            # 6. RETOUR
             # =====================================================
-            elif current == 4:
+            elif current == 5:
                 return
 
         elif key in (ord("q"), ord("Q")):
