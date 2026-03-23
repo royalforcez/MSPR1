@@ -6,7 +6,7 @@ from .eol_api import EOLClient
 from .audit_db import fetch_assets_from_db
 from .audit_csv import read_assets_from_csv
 from .audit_engine import audit_assets
-from .reports import write_report_csv
+from .reports import write_report_json
 
 
 MODULES = [
@@ -23,6 +23,9 @@ MODULES = [
 # =====================================================
 
 def get_status(eol_date):
+    """
+    Détermine le statut d'un OS à partir de sa date EOL.
+    """
 
     if not eol_date or eol_date == "N/A":
         return "INCONNU"
@@ -46,6 +49,9 @@ def get_status(eol_date):
 
 
 def extract_eol_date(release):
+    """
+    Extrait la date EOL depuis la réponse API.
+    """
 
     eol = release.get("eol")
 
@@ -68,6 +74,9 @@ def extract_eol_date(release):
 # =====================================================
 
 def get_assets_in_network(network_cidr, assets):
+    """
+    Filtre les équipements appartenant à un réseau donné.
+    """
 
     network = ipaddress.ip_network(network_cidr, strict=False)
 
@@ -104,11 +113,12 @@ def screen_obsolescence_audit(stdscr):
         stdscr.addstr(2, (w - len(title)) // 2, title)
         stdscr.attroff(curses.color_pair(3))
 
-        # MENU
+        # -------------------------------
+        # MENU PRINCIPAL
+        # -------------------------------
         for i, module in enumerate(MODULES):
 
             cp = curses.color_pair(2 if i == current else 1)
-
             stdscr.attrset(cp)
 
             if i == current:
@@ -125,7 +135,9 @@ def screen_obsolescence_audit(stdscr):
 
         key = stdscr.getch()
 
-        # NAVIGATION
+        # -------------------------------
+        # NAVIGATION MENU
+        # -------------------------------
         if key == curses.KEY_UP and current > 0:
             current -= 1
 
@@ -173,15 +185,10 @@ def screen_obsolescence_audit(stdscr):
                 except Exception as e:
                     stdscr.addstr(7, 4, str(e))
 
-                footer = "ESC: retour"
-                stdscr.addstr(h - 1, (w - len(footer)) // 2, footer)
+                stdscr.addstr(h - 1, 2, "ESC: retour")
 
-                stdscr.refresh()
-
-                while True:
-                    k = stdscr.getch()
-                    if k == 27:
-                        break
+                while stdscr.getch() != 27:
+                    pass
 
             # =====================================================
             # 2. LISTE RESEAU
@@ -219,10 +226,7 @@ def screen_obsolescence_audit(stdscr):
                     if not filtered:
                         stdscr.addstr(7, 4, "Aucun équipement trouvé.")
 
-                    footer = "F3: Export CSV | ESC: retour"
-                    stdscr.addstr(h - 1, (w - len(footer)) // 2, footer)
-
-                    stdscr.refresh()
+                    stdscr.addstr(h - 1, 2, "F3: Export JSON | ESC: retour")
 
                     while True:
                         k = stdscr.getch()
@@ -237,18 +241,15 @@ def screen_obsolescence_audit(stdscr):
                                     self.os_version = a.os_version
                                     self.status = ""
                                     self.eol_date = ""
+                                    self.days_to_eol = None
+                                    self.notes = "network scan"
 
                             export_data = [TempResult(a) for a in filtered]
 
-                            path = write_report_csv(export_data, source="network")
+                            path = write_report_json(export_data, source="network")
 
                             msg = f"Export : {path}"
-                            msg_y = h - 3
-
-                            stdscr.move(msg_y, 0)
-                            stdscr.clrtoeol()
-                            stdscr.addstr(msg_y, (w - len(msg)) // 2, msg)
-                            stdscr.refresh()
+                            stdscr.addstr(h - 3, 2, msg)
 
                         elif k == 27:
                             break
@@ -272,25 +273,14 @@ def screen_obsolescence_audit(stdscr):
 
                     stdscr.clear()
                     stdscr.addstr(5, 4, "Audit terminé ✔")
-
-                    footer = "F3: Export CSV | ESC: Retour"
-                    stdscr.addstr(h - 1, (w - len(footer)) // 2, footer)
-
-                    stdscr.refresh()
+                    stdscr.addstr(h - 1, 2, "F3: Export JSON | ESC: retour")
 
                     while True:
                         k = stdscr.getch()
 
                         if k == curses.KEY_F3:
-                            path = write_report_csv(results, source="db")
-
-                            msg = f"Export : {path}"
-                            msg_y = h - 3
-
-                            stdscr.move(msg_y, 0)
-                            stdscr.clrtoeol()
-                            stdscr.addstr(msg_y, (w - len(msg)) // 2, msg)
-                            stdscr.refresh()
+                            path = write_report_json(results, source="db")
+                            stdscr.addstr(h - 3, 2, f"Export : {path}")
 
                         elif k == 27:
                             break
@@ -319,25 +309,14 @@ def screen_obsolescence_audit(stdscr):
 
                     stdscr.clear()
                     stdscr.addstr(5, 4, "Audit terminé ✔")
-
-                    footer = "F3: Export CSV | ESC: Retour"
-                    stdscr.addstr(h - 1, (w - len(footer)) // 2, footer)
-
-                    stdscr.refresh()
+                    stdscr.addstr(h - 1, 2, "F3: Export JSON | ESC: retour")
 
                     while True:
                         k = stdscr.getch()
 
                         if k == curses.KEY_F3:
-                            export_path = write_report_csv(results, source="csv")
-
-                            msg = f"Export : {export_path}"
-                            msg_y = h - 3
-
-                            stdscr.move(msg_y, 0)
-                            stdscr.clrtoeol()
-                            stdscr.addstr(msg_y, (w - len(msg)) // 2, msg)
-                            stdscr.refresh()
+                            export_path = write_report_json(results, source="csv")
+                            stdscr.addstr(h - 3, 2, f"Export : {export_path}")
 
                         elif k == 27:
                             break
@@ -346,7 +325,9 @@ def screen_obsolescence_audit(stdscr):
                     stdscr.addstr(7, 4, str(e))
                     stdscr.getch()
 
+            # =====================================================
             # RETOUR
+            # =====================================================
             elif current == 4:
                 return
 
