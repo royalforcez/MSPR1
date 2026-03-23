@@ -5,27 +5,35 @@ from dataclasses import asdict
 from .utils import ensure_output_dir, now_ts, OUTPUT_DIR
 
 
-def write_report_json(results):
+def write_report_json(results, source="unknown"):
 
     ensure_output_dir()
 
-    path = os.path.join(OUTPUT_DIR, f"report_{now_ts()}.json")
+    path = os.path.join(
+        OUTPUT_DIR,
+        f"report_{source}_{now_ts()}.json"
+    )
 
     payload = {
+        "source": source,
+        "count": len(results),
         "results": [asdict(r) for r in results]
     }
 
-    with open(path, "w") as f:
-        json.dump(payload, f, indent=2)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False)
 
     return path
 
 
-def write_report_csv(results):
+def write_report_csv(results, source="unknown"):
 
     ensure_output_dir()
 
-    path = os.path.join(OUTPUT_DIR, f"report_{now_ts()}.csv")
+    path = os.path.join(
+        OUTPUT_DIR,
+        f"report_{source}_{now_ts()}.csv"
+    )
 
     fields = [
         "hostname",
@@ -36,7 +44,7 @@ def write_report_csv(results):
         "eol_date"
     ]
 
-    with open(path, "w", newline="") as f:
+    with open(path, "w", newline="", encoding="utf-8") as f:
 
         writer = csv.DictWriter(f, fieldnames=fields)
 

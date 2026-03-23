@@ -1,13 +1,13 @@
 import os
 from datetime import datetime
 
-# dossier de sortie
-OUTPUT_DIR = os.path.join("outputs", "obsolescence")
+# dossier unique pour tous les exports
+OUTPUT_DIR = "exports"
 
 
 def ensure_output_dir():
     """
-    Crée le dossier outputs/obsolescence si il n'existe pas
+    Crée le dossier exports si il n'existe pas
     """
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
