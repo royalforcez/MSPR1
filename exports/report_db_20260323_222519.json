@@ -1,0 +1,196 @@
+{
+    "generated_at": "20260323_222519",
+    "source": "db",
+    "results": [
+        {
+            "hostname": "Unknown-192.168.1.121",
+            "ip": "192.168.1.121",
+            "os_name": "UNKNOWN",
+            "os_version": "UNKNOWN",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        },
+        {
+            "hostname": "DEB13-MSPR1",
+            "ip": "192.168.1.137",
+            "os_name": "Debian GNU/Linux",
+            "os_version": "13.4",
+            "status": "SUPPORTED",
+            "eol_date": "2028-08-09",
+            "days_to_eol": 870,
+            "notes": "OK"
+        },
+        {
+            "hostname": "MSPR1-BDD-NTL",
+            "ip": "192.168.1.138",
+            "os_name": "Debian GNU/Linux",
+            "os_version": "12",
+            "status": "SOON_EOL",
+            "eol_date": "2026-06-10",
+            "days_to_eol": 79,
+            "notes": "OK"
+        },
+        {
+            "hostname": "MSPR1-BDD-WMS",
+            "ip": "192.168.1.139",
+            "os_name": "Debian GNU/Linux",
+            "os_version": "12",
+            "status": "SOON_EOL",
+            "eol_date": "2026-06-10",
+            "days_to_eol": 79,
+            "notes": "OK"
+        },
+        {
+            "hostname": "Unknown-192.168.1.17",
+            "ip": "192.168.1.17",
+            "os_name": "UNKNOWN",
+            "os_version": "UNKNOWN",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        },
+        {
+            "hostname": "Unknown-192.168.1.177",
+            "ip": "192.168.1.177",
+            "os_name": "UNKNOWN",
+            "os_version": "UNKNOWN",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        },
+        {
+            "hostname": "dEB13-SERV-MC",
+            "ip": "192.168.1.180",
+            "os_name": "Debian GNU/Linux",
+            "os_version": "13.4",
+            "status": "SUPPORTED",
+            "eol_date": "2028-08-09",
+            "days_to_eol": 870,
+            "notes": "OK"
+        },
+        {
+            "hostname": "Unknown-192.168.1.194",
+            "ip": "192.168.1.194",
+            "os_name": "UNKNOWN",
+            "os_version": "UNKNOWN",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        },
+        {
+            "hostname": "Unknown-192.168.1.254",
+            "ip": "192.168.1.254",
+            "os_name": "UNKNOWN",
+            "os_version": "UNKNOWN",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        },
+        {
+            "hostname": "Unknown-192.168.1.62",
+            "ip": "192.168.1.62",
+            "os_name": "UNKNOWN",
+            "os_version": "UNKNOWN",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        },
+        {
+            "hostname": "Unknown-192.168.1.63",
+            "ip": "192.168.1.63",
+            "os_name": "UNKNOWN",
+            "os_version": "UNKNOWN",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        },
+        {
+            "hostname": "Unknown-192.168.1.95",
+            "ip": "192.168.1.95",
+            "os_name": "UNKNOWN",
+            "os_version": "UNKNOWN",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        },
+        {
+            "hostname": "DC-01",
+            "ip": "192.168.1.11",
+            "os_name": "Microsoft Windows Server 2025 Standard",
+            "os_version": "10.0.26100",
+            "status": "SUPPORTED",
+            "eol_date": "2034-10-10",
+            "days_to_eol": 3123,
+            "notes": "OK"
+        },
+        {
+            "hostname": "DC-02",
+            "ip": "192.168.1.12",
+            "os_name": "Microsoft Windows Server 2025 Standard",
+            "os_version": "10.0.26100",
+            "status": "SUPPORTED",
+            "eol_date": "2034-10-10",
+            "days_to_eol": 3123,
+            "notes": "OK"
+        },
+        {
+            "hostname": "ubuntu-server",
+            "ip": "192.168.1.152",
+            "os_name": "Ubuntu",
+            "os_version": "25.10",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        },
+        {
+            "hostname": "Unknown-192.168.1.182",
+            "ip": "192.168.1.182",
+            "os_name": "UNKNOWN",
+            "os_version": "UNKNOWN",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        },
+        {
+            "hostname": "Unknown-192.168.1.183",
+            "ip": "192.168.1.183",
+            "os_name": "UNKNOWN",
+            "os_version": "UNKNOWN",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        },
+        {
+            "hostname": "UBUNTU-24",
+            "ip": "192.168.1.191",
+            "os_name": "Ubuntu",
+            "os_version": "24.04",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        },
+        {
+            "hostname": "Unknown-192.168.1.67",
+            "ip": "192.168.1.67",
+            "os_name": "UNKNOWN",
+            "os_version": "UNKNOWN",
+            "status": "UNKNOWN",
+            "eol_date": null,
+            "days_to_eol": null,
+            "notes": "OS non supporté par l'API"
+        }
+    ]
+}
