@@ -49,10 +49,10 @@ def read_assets_from_csv(path):
             for line in reader:
 
                 asset = Asset(
-                    hostname=line.get("hostname"),
-                    ip=line.get("ip"),
-                    os_name=line.get("os_name"),
-                    os_version=line.get("os_version")
+                    hostname=line.get("hostname") or "UNKNOWN",
+                    ip=line.get("ip") or None,
+                    os_name=line.get("os_name") or "UNKNOWN",
+                    os_version=line.get("os_version") or "UNKNOWN"
                 )
 
                 assets.append(asset)

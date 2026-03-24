@@ -2,11 +2,15 @@ from datetime import date, datetime
 from .models import AuditResult
 import re
 
+
 # =========================================================
-# NORMALISATION
+# NORMALISATION DES DONNÉES
 # =========================================================
 
 def normalize_os(os_name):
+    """
+    Transforme le nom d'OS en format compatible avec l'API EOL.
+    """
     if not os_name:
         return None
 
@@ -22,11 +26,15 @@ def normalize_os(os_name):
 
 
 def normalize_version(version, os_name=None):
+    """
+    Extrait une version simplifiée pour correspondre aux cycles API.
+    """
+
     if not version:
         return None
 
     # -------------------------------
-    # CAS WINDOWS → extraction année depuis Caption
+    # CAS WINDOWS → extraction année
     # -------------------------------
     if os_name and "windows server" in os_name.lower():
         match = re.search(r"\b(20\d{2})\b", os_name)
@@ -34,7 +42,7 @@ def normalize_version(version, os_name=None):
             return match.group(1)
 
     # -------------------------------
-    # CAS LINUX (Debian, etc.)
+    # CAS LINUX (ex: 10.3 → 10)
     # -------------------------------
     version = str(version)
 
@@ -45,25 +53,35 @@ def normalize_version(version, os_name=None):
 
 
 # =========================================================
-# OUTILS DATE / STATUT
+# OUTILS DE GESTION DES DATES
 # =========================================================
 
-def parse_iso_date(d):
-    if not d:
+def parse_iso_date(date_str):
+    """
+    Convertit une date ISO (YYYY-MM-DD) en objet date Python.
+    """
+    if not date_str:
         return None
 
     try:
-        return datetime.strptime(d, "%Y-%m-%d").date()
+        return datetime.strptime(date_str, "%Y-%m-%d").date()
     except ValueError:
         return None
 
 
-def compute_status(eol_from):
-    if eol_from is None:
+def compute_status(eol_date):
+    """
+    Détermine le statut de support d'un OS :
+    - EOL
+    - SOON_EOL
+    - SUPPORTED
+    """
+
+    if eol_date is None:
         return "UNKNOWN", None
 
     today = date.today()
-    delta = (eol_from - today).days
+    delta = (eol_date - today).days
 
     if delta < 0:
         return "EOL", delta
@@ -75,28 +93,34 @@ def compute_status(eol_from):
 
 
 # =========================================================
-# MOTEUR D'AUDIT
+# MOTEUR PRINCIPAL D'AUDIT
 # =========================================================
 
 def audit_assets(assets, client):
+    """
+    Analyse une liste d'assets et retourne leur statut EOL.
+    
+    - assets : liste d'objets Asset
+    - client : instance EOLClient
+    """
 
     results = []
 
-    for a in assets:
+    for asset in assets:
 
         try:
             # -------------------------------
-            # 1. Normalisation OS
+            # 1. Normalisation du produit
             # -------------------------------
-            product = normalize_os(a.os_name)
+            product = normalize_os(asset.os_name)
 
             if not product:
                 results.append(
                     AuditResult(
-                        a.hostname,
-                        a.ip,
-                        a.os_name,
-                        a.os_version,
+                        asset.hostname,
+                        asset.ip,
+                        asset.os_name,
+                        asset.os_version,
                         None,
                         None,
                         None,
@@ -109,34 +133,34 @@ def audit_assets(assets, client):
                 continue
 
             # -------------------------------
-            # 2. Appel API
+            # 2. Récupération des versions API
             # -------------------------------
             releases = client.list_releases(product)
 
             # -------------------------------
-            # 3. Normalisation version
+            # 3. Normalisation de la version
             # -------------------------------
-            normalized_version = normalize_version(a.os_version, a.os_name)
+            normalized_version = normalize_version(asset.os_version, asset.os_name)
 
-            rel = None
+            matched_release = None
 
-            for r in releases:
-                cycle = str(r.get("cycle") or r.get("name"))
+            for release in releases:
+                cycle = str(release.get("cycle") or release.get("name"))
 
                 if cycle == normalized_version:
-                    rel = r
+                    matched_release = release
                     break
 
             # -------------------------------
             # 4. Version non trouvée
             # -------------------------------
-            if not rel:
+            if not matched_release:
                 results.append(
                     AuditResult(
-                        a.hostname,
-                        a.ip,
-                        a.os_name,
-                        a.os_version,
+                        asset.hostname,
+                        asset.ip,
+                        asset.os_name,
+                        asset.os_version,
                         product,
                         None,
                         None,
@@ -149,51 +173,52 @@ def audit_assets(assets, client):
                 continue
 
             # -------------------------------
-            # 5. Récupération EOL
+            # 5. Récupération de la date EOL
             # -------------------------------
             eol_date_str = (
-                rel.get("eolFrom")
-                or rel.get("eol")
-                or rel.get("eolDate")
+                matched_release.get("eolFrom")
+                or matched_release.get("eol")
+                or matched_release.get("eolDate")
             )
 
-            eol_dt = parse_iso_date(eol_date_str)
+            eol_date = parse_iso_date(eol_date_str)
 
-            status, days = compute_status(eol_dt)
+            status, days_remaining = compute_status(eol_date)
 
             # -------------------------------
             # 6. Résultat final
             # -------------------------------
             results.append(
                 AuditResult(
-                    a.hostname,
-                    a.ip,
-                    a.os_name,
-                    a.os_version,
+                    asset.hostname,
+                    asset.ip,
+                    asset.os_name,
+                    asset.os_version,
                     product,
-                    rel.get("cycle"),
+                    matched_release.get("cycle"),
                     eol_date_str,
-                    rel.get("isEol"),
+                    matched_release.get("isEol"),
                     status,
-                    days,
+                    days_remaining,
                     "OK"
                 )
             )
 
         except Exception as e:
+            # Gestion des erreurs par asset (ne bloque pas tout l'audit)
             results.append(
                 AuditResult(
-                    a.hostname,
-                    a.ip,
-                    a.os_name,
-                    a.os_version,
+                    asset.hostname,
+                    asset.ip,
+                    asset.os_name,
+                    asset.os_version,
                     None,
                     None,
                     None,
                     None,
                     "UNKNOWN",
                     None,
-                    str(e)
+                    f"Erreur : {str(e)}"
                 )
             )
 
