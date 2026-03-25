@@ -2,11 +2,13 @@ import time
 import sys
 from core.scanner import run_network_scan
 from core.monitoring import run_system_monitoring
+from core.eol import run_eol_feed
 
 # === CONFIGURATION DES INTERVALLES (en secondes) ===
 INTERVAL_CPU_RAM = 60          # Fréquent : 1 minute
-INTERVAL_DISK = 86400           # Peu fréquent : 1 heure
-INTERVAL_SCAN = 86400          # Scan Nmap : 24 heures
+INTERVAL_DISK = 86400          # Peu fréquent : 24 heures
+INTERVAL_SCAN = 86400          # Peu fréquent : 24 heures
+INTERVAL_EOL = 86400           # Peu fréquent : 24 heures
 
 def main():
     print("=========================================")
@@ -17,6 +19,7 @@ def main():
     last_cpu_ram = 0
     last_disk = 0
     last_scan = 0
+    last_eol = 0
 
     try:
         while True:
@@ -39,6 +42,14 @@ def main():
                 print("\n[*] Lancement de la tâche : MONITORING (DISK)")
                 run_system_monitoring(check_type="disk")
                 last_disk = current_time
+
+            # 4. Check EOL (Peu fréquent)
+            if current_time - last_eol >= INTERVAL_EOL:
+                print("\n[*] Lancement de la tâche : EOL UPDATE")
+                # CORRECTION ICI : La fonction n'a plus besoin d'arguments
+                run_eol_feed() 
+                print("[*] EOL update terminé")
+                last_eol = current_time
 
             time.sleep(10)
             
