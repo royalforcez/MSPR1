@@ -5,7 +5,7 @@ from core.monitoring import run_system_monitoring
 
 # === CONFIGURATION DES INTERVALLES (en secondes) ===
 INTERVAL_CPU_RAM = 60          # Fréquent : 1 minute
-INTERVAL_DISK = 3600           # Peu fréquent : 1 heure
+INTERVAL_DISK = 86400           # Peu fréquent : 1 heure
 INTERVAL_SCAN = 86400          # Scan Nmap : 24 heures
 
 def main():

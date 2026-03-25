@@ -58,9 +58,9 @@ def run_system_monitoring(check_type="all"):
         print("[ERR-3001] Get BDD Fail : Aucun équipement actif trouvé ou erreur BDD.")
         return
 
-    ad_domain = os.getenv('AD_DOMAIN', 'NTL')
-    ad_user = os.getenv('AD_USER', 'Administrateur')
-    ad_pass = os.getenv('AD_PASS', 'Formation2025')
+    ad_domain = os.getenv('AD_DOMAIN')
+    ad_user = os.getenv('AD_USER')
+    ad_pass = os.getenv('AD_PASS')
     
     for eq in equipments:
         status = check_port(eq['ipv4'], 22)
