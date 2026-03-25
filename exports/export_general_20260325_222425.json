@@ -1,0 +1,200 @@
+{
+    "metadata": {
+        "source": "NTLSysToolbox - Diagnostic Général",
+        "date": "25/03/2026 22:24:25",
+        "filter_active": "NONE",
+        "total_count": 19
+    },
+    "data": [
+        {
+            "Nom": "Unknown-192.168.1.121",
+            "IPv4": "192.168.1.121",
+            "OS": null,
+            "CPU_Percent": null,
+            "RAM_Usage_Percent": null,
+            "disk_usage_percent": null,
+            "uptime": null,
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "DEB13-MSPR1",
+            "IPv4": "192.168.1.137",
+            "OS": "Debian GNU/Linux",
+            "CPU_Percent": 0,
+            "RAM_Usage_Percent": 40.38,
+            "disk_usage_percent": 0.0,
+            "uptime": "up 1 hour, 2 minutes",
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "MSPR1-BDD-NTL",
+            "IPv4": "192.168.1.138",
+            "OS": "Debian GNU/Linux",
+            "CPU_Percent": 0,
+            "RAM_Usage_Percent": 30.24,
+            "disk_usage_percent": 0.0,
+            "uptime": "up 1 hour, 3 minutes",
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "MSPR1-BDD-WMS",
+            "IPv4": "192.168.1.139",
+            "OS": "Debian GNU/Linux",
+            "CPU_Percent": 0,
+            "RAM_Usage_Percent": 29.22,
+            "disk_usage_percent": 0.0,
+            "uptime": "up 1 hour, 3 minutes",
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "Unknown-192.168.1.17",
+            "IPv4": "192.168.1.17",
+            "OS": null,
+            "CPU_Percent": null,
+            "RAM_Usage_Percent": null,
+            "disk_usage_percent": null,
+            "uptime": null,
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "Unknown-192.168.1.177",
+            "IPv4": "192.168.1.177",
+            "OS": null,
+            "CPU_Percent": null,
+            "RAM_Usage_Percent": null,
+            "disk_usage_percent": null,
+            "uptime": null,
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "dEB13-SERV-MC",
+            "IPv4": "192.168.1.180",
+            "OS": "Debian GNU/Linux",
+            "CPU_Percent": 2,
+            "RAM_Usage_Percent": 53.64,
+            "disk_usage_percent": 0.0,
+            "uptime": "up 3 hours, 20 minutes",
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "Unknown-192.168.1.194",
+            "IPv4": "192.168.1.194",
+            "OS": null,
+            "CPU_Percent": null,
+            "RAM_Usage_Percent": null,
+            "disk_usage_percent": null,
+            "uptime": null,
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "Unknown-192.168.1.254",
+            "IPv4": "192.168.1.254",
+            "OS": null,
+            "CPU_Percent": null,
+            "RAM_Usage_Percent": null,
+            "disk_usage_percent": null,
+            "uptime": null,
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "Unknown-192.168.1.62",
+            "IPv4": "192.168.1.62",
+            "OS": null,
+            "CPU_Percent": null,
+            "RAM_Usage_Percent": null,
+            "disk_usage_percent": null,
+            "uptime": null,
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "Unknown-192.168.1.63",
+            "IPv4": "192.168.1.63",
+            "OS": null,
+            "CPU_Percent": null,
+            "RAM_Usage_Percent": null,
+            "disk_usage_percent": null,
+            "uptime": null,
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "Unknown-192.168.1.95",
+            "IPv4": "192.168.1.95",
+            "OS": null,
+            "CPU_Percent": null,
+            "RAM_Usage_Percent": null,
+            "disk_usage_percent": null,
+            "uptime": null,
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "DC-01",
+            "IPv4": "192.168.1.11",
+            "OS": "Microsoft Windows Server 2025 Standard",
+            "CPU_Percent": 5,
+            "RAM_Usage_Percent": 37.23,
+            "disk_usage_percent": 0.0,
+            "uptime": "up 5 hours",
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "DC-02",
+            "IPv4": "192.168.1.12",
+            "OS": "Microsoft Windows Server 2025 Standard",
+            "CPU_Percent": 2,
+            "RAM_Usage_Percent": 50.8,
+            "disk_usage_percent": 0.0,
+            "uptime": "up 10 hours",
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "ubuntu-server",
+            "IPv4": "192.168.1.152",
+            "OS": "Ubuntu",
+            "CPU_Percent": 0,
+            "RAM_Usage_Percent": 14.97,
+            "disk_usage_percent": 0.0,
+            "uptime": "up 25 minutes",
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "Unknown-192.168.1.182",
+            "IPv4": "192.168.1.182",
+            "OS": null,
+            "CPU_Percent": null,
+            "RAM_Usage_Percent": null,
+            "disk_usage_percent": null,
+            "uptime": null,
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "Unknown-192.168.1.183",
+            "IPv4": "192.168.1.183",
+            "OS": null,
+            "CPU_Percent": null,
+            "RAM_Usage_Percent": null,
+            "disk_usage_percent": null,
+            "uptime": null,
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "UBUNTU-24",
+            "IPv4": "192.168.1.191",
+            "OS": "Ubuntu",
+            "CPU_Percent": 9,
+            "RAM_Usage_Percent": 30.37,
+            "disk_usage_percent": 0.0,
+            "uptime": "up 26 minutes",
+            "Site": "Lille-Siege"
+        },
+        {
+            "Nom": "Unknown-192.168.1.67",
+            "IPv4": "192.168.1.67",
+            "OS": null,
+            "CPU_Percent": null,
+            "RAM_Usage_Percent": null,
+            "disk_usage_percent": null,
+            "uptime": null,
+            "Site": "Lille-Siege"
+        }
+    ]
+}
