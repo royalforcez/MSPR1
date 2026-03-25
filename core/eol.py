@@ -1,7 +1,8 @@
-import mysql.connector
 import requests
 import re
 from datetime import datetime
+
+from core.database import get_connection
 
 
 EOL_API_BASE = "https://endoflife.date/api/v1"
@@ -47,7 +48,7 @@ def normalize_version(version, os_name=None):
 
 
 # =====================================================
-# API EOL
+# API
 # =====================================================
 
 def get_releases(product):
@@ -59,7 +60,6 @@ def get_releases(product):
         raise RuntimeError(f"Erreur API pour {product}")
 
     data = r.json()
-
     return (data.get("result") or {}).get("releases") or []
 
 
@@ -67,18 +67,13 @@ def get_releases(product):
 # BDD
 # =====================================================
 
-def fetch_os_from_db(db_config):
-    conn = mysql.connector.connect(**db_config)
+def fetch_os_from_db():
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT 
-            e.id_os,
-            o.nom_os,
-            o.version_os
-        FROM tb_equipements e
-        JOIN tb_os o ON e.id_os = o.id
-        WHERE o.nom_os IS NOT NULL
+        SELECT id, nom_os, version_os
+        FROM tb_os
     """)
 
     rows = cursor.fetchall()
@@ -118,17 +113,13 @@ def upsert_eol(conn, id_os, date_exp, fin_support):
 
 
 # =====================================================
-# MAIN JOB
+# MAIN
 # =====================================================
 
-def run_eol_feed(db_config):
-    """
-    Fonction appelée par la tâche automatique
-    """
+def run_eol_feed():
+    conn = get_connection()
 
-    conn = mysql.connector.connect(**db_config)
-
-    os_list = fetch_os_from_db(db_config)
+    os_list = fetch_os_from_db()
 
     for id_os, os_name, os_version in os_list:
 
@@ -161,6 +152,8 @@ def run_eol_feed(db_config):
             )
 
             upsert_eol(conn, id_os, eol_date, eol_date)
+
+            print(f"[EOL OK] {os_name} {os_version} -> {eol_date}")
 
         except Exception as e:
             print(f"[EOL ERROR] {os_name} {os_version} -> {e}")
