@@ -21,4 +21,5 @@ python-nmap==0.7.1
 requests==2.33.0
 urllib3==2.6.3
 windows-curses==2.4.1
-
+pyinstaller==6.11.0
+pipreqs==0.5.0
