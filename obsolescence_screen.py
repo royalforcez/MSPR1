@@ -1,17 +1,38 @@
 import curses
 import ipaddress
+import os
+import csv
+import re
 from datetime import datetime
 
 from session_manager import get_db_connection_ntl
 from obsolescence.eol_api import EOLClient
 
 
-MODULES = [
-    "Lister les versions d’un OS et leurs dates de fin de vie",
-    "Lister les composants d’une plage réseau",
-    "Lancer un audit depuis la base de données",
-    "Retour au menu principal"
-]
+EXPORT_DIR = "exports"
+
+
+# =====================================================
+# EXPORT CSV
+# =====================================================
+
+def export_csv(data, source):
+
+    if not os.path.exists(EXPORT_DIR):
+        os.makedirs(EXPORT_DIR)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"audit_{source}_{timestamp}.csv"
+    path = os.path.join(EXPORT_DIR, filename)
+
+    with open(path, mode="w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Hostname", "IP", "OS", "Version", "EOL", "Statut"])
+
+        for row in data:
+            writer.writerow(row)
+
+    return path
 
 
 # =====================================================
@@ -45,6 +66,65 @@ def get_status(eol_date):
 
 
 # =====================================================
+# NORMALISATION OS / VERSION
+# =====================================================
+
+def normalize_os(os_name):
+
+    if not os_name:
+        return None
+
+    os_name = os_name.lower()
+
+    if "debian" in os_name:
+        return "debian"
+
+    if "ubuntu" in os_name:
+        return "ubuntu"
+
+    if "windows server" in os_name:
+        return "windows-server"
+
+    return None
+
+
+def normalize_version(version, os_name=None):
+
+    if not version:
+        return None
+
+    if os_name and "windows server" in os_name.lower():
+        match = re.search(r"\b(20\d{2})\b", os_name)
+        if match:
+            return match.group(1)
+
+    version = str(version).strip()
+
+    if "." in version:
+        return version.split(".")[0]
+
+    return version
+
+
+def extract_eol_date(release):
+
+    eol = release.get("eol")
+
+    if isinstance(eol, dict):
+        return eol.get("date", "N/A")
+
+    if isinstance(eol, str):
+        return eol
+
+    return (
+        release.get("eolFrom")
+        or release.get("eolDate")
+        or release.get("extendedSupport")
+        or "N/A"
+    )
+
+
+# =====================================================
 # FETCH BDD
 # =====================================================
 
@@ -73,6 +153,118 @@ def fetch_all_assets():
 
 
 # =====================================================
+# LECTURE CSV
+# =====================================================
+
+def read_assets_from_csv(path):
+
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Fichier introuvable : {path}")
+
+    assets = []
+
+    with open(path, mode="r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+
+        required_fields = ["hostname", "ip", "os_name", "os_version"]
+
+        if not reader.fieldnames:
+            raise ValueError("CSV vide ou mal formaté")
+
+        missing = [field for field in required_fields if field not in reader.fieldnames]
+        if missing:
+            raise ValueError(
+                f"Colonnes manquantes : {missing} | Attendu : {required_fields}"
+            )
+
+        for line in reader:
+            assets.append({
+                "hostname": (line.get("hostname") or "UNKNOWN").strip(),
+                "ip": (line.get("ip") or "").strip(),
+                "os_name": (line.get("os_name") or "UNKNOWN").strip(),
+                "os_version": (line.get("os_version") or "UNKNOWN").strip()
+            })
+
+    return assets
+
+
+# =====================================================
+# AUDIT CSV
+# =====================================================
+
+def audit_csv_assets(assets, client):
+
+    results = []
+
+    for asset in assets:
+
+        hostname = asset["hostname"]
+        ip = asset["ip"]
+        os_name = asset["os_name"]
+        os_version = asset["os_version"]
+
+        try:
+            product = normalize_os(os_name)
+
+            if not product:
+                results.append([
+                    hostname,
+                    ip,
+                    os_name,
+                    os_version,
+                    "N/A",
+                    "INCONNU"
+                ])
+                continue
+
+            releases = client.list_releases(product)
+            normalized_version = normalize_version(os_version, os_name)
+
+            matched = None
+
+            for release in releases:
+                cycle = str(release.get("cycle") or release.get("name") or "")
+                if cycle == normalized_version:
+                    matched = release
+                    break
+
+            if not matched:
+                results.append([
+                    hostname,
+                    ip,
+                    os_name,
+                    os_version,
+                    "N/A",
+                    "INCONNU"
+                ])
+                continue
+
+            eol = extract_eol_date(matched)
+            status = get_status(eol)
+
+            results.append([
+                hostname,
+                ip,
+                os_name,
+                os_version,
+                eol,
+                status
+            ])
+
+        except Exception:
+            results.append([
+                hostname,
+                ip,
+                os_name,
+                os_version,
+                "N/A",
+                "INCONNU"
+            ])
+
+    return results
+
+
+# =====================================================
 # FILTRAGE RESEAU
 # =====================================================
 
@@ -93,7 +285,17 @@ def filter_by_network(network_cidr, rows):
 def screen_obsolescence_audit(stdscr):
 
     stdscr.keypad(True)
+
+    client = EOLClient()
     current = 0
+
+    MODULES = [
+        "Lister les versions d’un OS et leurs dates de fin de vie",
+        "Lister les composants d’une plage réseau",
+        "Lancer un audit depuis la base de données",
+        "Lancer un audit depuis un fichier CSV",
+        "Retour au menu principal"
+    ]
 
     while True:
 
@@ -115,6 +317,7 @@ def screen_obsolescence_audit(stdscr):
         for i, module in enumerate(MODULES):
 
             cp = curses.color_pair(2 if i == current else 1)
+
             stdscr.attrset(cp)
 
             if i == current:
@@ -138,7 +341,7 @@ def screen_obsolescence_audit(stdscr):
         elif key == curses.KEY_DOWN and current < len(MODULES) - 1:
             current += 1
 
-        elif key in (10, 13):
+        elif key in (10, 13, curses.KEY_ENTER):
 
             # =====================================================
             # 1. API EOL DIRECT
@@ -156,7 +359,6 @@ def screen_obsolescence_audit(stdscr):
                 curses.noecho()
 
                 try:
-                    client = EOLClient()
                     releases = client.list_releases(product)
 
                     stdscr.clear()
@@ -166,10 +368,8 @@ def screen_obsolescence_audit(stdscr):
                     line = 7
 
                     for r in releases:
-
                         version = r.get("cycle") or r.get("name") or "N/A"
-                        eol = r.get("eol") or "N/A"
-
+                        eol = extract_eol_date(r)
                         status = get_status(eol)
 
                         text = f"{version:<15} {eol:<15} {status}"
@@ -188,7 +388,7 @@ def screen_obsolescence_audit(stdscr):
                     stdscr.getch()
 
             # =====================================================
-            # 2. RESEAU (BDD)
+            # 2. RESEAU (BDD + EXPORT)
             # =====================================================
             elif current == 1:
 
@@ -211,27 +411,50 @@ def screen_obsolescence_audit(stdscr):
                     stdscr.addstr(5, 4, "HOSTNAME        IP              OS              VERSION")
 
                     line = 7
+                    display_data = []
 
                     for r in filtered:
                         hostname, ip, os_name, version, _ = r
 
                         text = f"{hostname:<15} {ip:<15} {os_name:<20} {version}"
 
+                        display_data.append([hostname, ip, os_name, version, "", ""])
+
                         if line < h - 2:
                             stdscr.addstr(line, 4, text)
                             line += 1
 
-                    stdscr.addstr(h - 1, 2, "ESC: retour")
+                    if not filtered:
+                        stdscr.addstr(7, 4, "Aucun équipement trouvé.")
 
-                    while stdscr.getch() != 27:
-                        pass
+                    footer = "F3: Export CSV | ESC: retour"
+                    stdscr.addstr(h - 1, (w - len(footer)) // 2, footer)
+
+                    stdscr.refresh()
+
+                    while True:
+                        k = stdscr.getch()
+
+                        if k == curses.KEY_F3 and filtered:
+                            path = export_csv(display_data, "network")
+
+                            msg = f"Export : {path}"
+                            msg_y = h - 3
+
+                            stdscr.move(msg_y, 0)
+                            stdscr.clrtoeol()
+                            stdscr.addstr(msg_y, (w - len(msg)) // 2, msg)
+                            stdscr.refresh()
+
+                        elif k == 27:
+                            break
 
                 except Exception as e:
                     stdscr.addstr(7, 4, f"Erreur BDD : {e}")
                     stdscr.getch()
 
             # =====================================================
-            # 3. AUDIT BDD
+            # 3. AUDIT BDD + EXPORT
             # =====================================================
             elif current == 2:
 
@@ -247,9 +470,9 @@ def screen_obsolescence_audit(stdscr):
                     stdscr.addstr(5, 4, "HOSTNAME        IP              OS              VERSION     EOL         STATUT")
 
                     line = 7
+                    display_data = []
 
                     for r in rows:
-
                         hostname, ip, os_name, version, eol = r
 
                         status = get_status(eol)
@@ -257,23 +480,104 @@ def screen_obsolescence_audit(stdscr):
 
                         text = f"{hostname:<15} {ip:<15} {os_name:<20} {version:<10} {eol_str:<12} {status}"
 
+                        display_data.append([hostname, ip, os_name, version, eol_str, status])
+
                         if line < h - 2:
                             stdscr.addstr(line, 4, text)
                             line += 1
 
-                    stdscr.addstr(h - 1, 2, "ESC: retour")
+                    footer = "F3: Export CSV | ESC: retour"
+                    stdscr.addstr(h - 1, (w - len(footer)) // 2, footer)
 
-                    while stdscr.getch() != 27:
-                        pass
+                    stdscr.refresh()
+
+                    while True:
+                        k = stdscr.getch()
+
+                        if k == curses.KEY_F3:
+                            path = export_csv(display_data, "db")
+
+                            msg = f"Export : {path}"
+                            msg_y = h - 3
+
+                            stdscr.move(msg_y, 0)
+                            stdscr.clrtoeol()
+                            stdscr.addstr(msg_y, (w - len(msg)) // 2, msg)
+                            stdscr.refresh()
+
+                        elif k == 27:
+                            break
 
                 except Exception as e:
                     stdscr.addstr(7, 4, f"Erreur BDD : {e}")
                     stdscr.getch()
 
             # =====================================================
-            # RETOUR
+            # 4. AUDIT CSV + EXPORT
             # =====================================================
             elif current == 3:
+
+                stdscr.clear()
+                stdscr.addstr(5, 4, "Chemin CSV : ")
+
+                curses.echo()
+                stdscr.move(5, 17)
+                stdscr.clrtoeol()
+                path = stdscr.getstr().decode("utf-8").strip()
+                curses.noecho()
+
+                try:
+                    assets = read_assets_from_csv(path)
+                    results = audit_csv_assets(assets, client)
+
+                    stdscr.clear()
+                    stdscr.addstr(3, 4, "Résultat audit CSV :")
+                    stdscr.addstr(5, 4, "HOSTNAME        IP              OS              VERSION     EOL         STATUT")
+
+                    line = 7
+                    display_data = []
+
+                    for row in results:
+                        hostname, ip, os_name, version, eol, status = row
+
+                        text = f"{hostname:<15} {ip:<15} {os_name:<20} {version:<10} {eol:<12} {status}"
+
+                        display_data.append([hostname, ip, os_name, version, eol, status])
+
+                        if line < h - 2:
+                            stdscr.addstr(line, 4, text)
+                            line += 1
+
+                    footer = "F3: Export CSV | ESC: retour"
+                    stdscr.addstr(h - 1, (w - len(footer)) // 2, footer)
+
+                    stdscr.refresh()
+
+                    while True:
+                        k = stdscr.getch()
+
+                        if k == curses.KEY_F3 and display_data:
+                            export_path = export_csv(display_data, "csv")
+
+                            msg = f"Export : {export_path}"
+                            msg_y = h - 3
+
+                            stdscr.move(msg_y, 0)
+                            stdscr.clrtoeol()
+                            stdscr.addstr(msg_y, (w - len(msg)) // 2, msg)
+                            stdscr.refresh()
+
+                        elif k == 27:
+                            break
+
+                except Exception as e:
+                    stdscr.addstr(7, 4, f"Erreur CSV : {e}")
+                    stdscr.getch()
+
+            # =====================================================
+            # RETOUR
+            # =====================================================
+            elif current == 4:
                 return
 
         elif key == 27:
