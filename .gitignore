@@ -6,3 +6,4 @@ backups/csv/*
 backups/sql/*
 exports/
 outputs/
+.env/
