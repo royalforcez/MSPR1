@@ -46,7 +46,7 @@ def ask_credentials(stdscr):
     
     stdscr.clear()
     stdscr.attron(curses.A_BOLD)
-    stdscr.addstr(1, (w - 38) // 2, "🔐 CONFIGURATION DES ACCÈS RÉSEAU")
+    stdscr.addstr(1, (w - 38) // 2, "  CONFIGURATION DES ACCÈS RÉSEAU")
     stdscr.attroff(curses.A_BOLD)
     stdscr.addstr(3, 2, " [F12] Charger config.txt | [ENTRÉE] Saisie Manuelle ", curses.A_DIM)
     stdscr.refresh()
