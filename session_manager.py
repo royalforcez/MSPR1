@@ -96,3 +96,14 @@ def ask_credentials(stdscr):
     stdscr.addstr(h // 2, (w - 20) // 2, "✅ CONFIGURATION TERMINEE", curses.A_BOLD)
     stdscr.refresh()
     curses.napms(1200)
+
+# --- OBSOLESCENCE ---
+import mysql.connector
+
+def get_db_connection_ntl():
+    return mysql.connector.connect(
+        host=DB_NTL["host"],
+        user=DB_NTL["user"],
+        password=DB_NTL["password"],
+        database=DB_NTL["database"]
+    )
