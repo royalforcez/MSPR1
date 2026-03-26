@@ -16,15 +16,41 @@
 Arborescence :
 
 
-NTLSysToolbox/
-│
+NTL‑SysToolbox CLI
+├── _pycache_
+├── assets
+├── build/NTLsystoolbox
+├── diagnostic
+|	├── data_manager.py
+|	├── diagnostic_view.py
+|	└── services.py
+├── dist
+|	└── NTLsystoolbox.exe
+├── exports
+├── obsolescence
+|	├── _init_.py
+|	├── audit_csv.py
+|	├── audit_db.py
+|	├── audit_engine.py
+|	├── eol_api.py
+|	├── models.py
+|	├── obsolescence.py
+|	├── reports.py
+|	└── utils.py
+├── .gitignore
+├── NTLsystoolbox.spec
+├── README.md
+├── diagnostic_module.py
+├── home.py
 ├── main.py
-├── ui.py                # loading_screen + draw_frame + couleurs
-├── home.py              # écran d’accueil / menu
-├── diagnostic.py        # module 1
-├── wms_backup.py        # module 2
-├── obsolescence.py      # module 3
-└── requirements.py      # liste des bibliotèques pythons
+├── requirements.txt
+├── session_manager.py
+├── ui.py
+└── wms_backup.py
+
+
+
+
 
 how to start ?
 
@@ -36,27 +62,32 @@ bibliothèque utilisée :
 
 
 
-CURSES ----- Utilité ---->
+Le projet s'appuie sur une sélection de bibliothèques ciblées :
 
-Gérer l’interface terminal “text-based”.
-Permet de faire :
-Fenêtres, cadres, bordures (draw_frame)
-Couleurs (curses.init_pair)
-Positionnement du texte (addstr)
-Gestion du clavier (getch)
-Masquer le curseur (curs_set(0))
+mysql-connector-python : Pilotage natif des échanges avec la base de données.
 
-curses fait partie de la stdlib Python, donc il n’a pas de date de fin de support tant que Python le maintient.
-Tant que Python existe et est mis à jour, curses fonctionne.
+curses : Gestion de l'affichage matriciel et des événements clavier.
 
+json & csv : Modules standards pour la sérialisation des données et la génération de rapports interopérables.
 
-TIME ----- Utilité ---->
+decimal (Decimal) : Crucial pour la précision financière et technique. Par défaut, le format JSON ne supporte pas le type Decimal provenant de MySQL. L'import de ce module permet de convertir les données de stockage en types numériques sérialisables (float) sans perdre de précision lors du traitement.
 
-Gérer les delays pour les animations :
-time.sleep(0.01) pour la barre de chargement
-Permet de ralentir l’interface afin que l’utilisateur voie la progression.
+time & datetime : Utilisées pour le rafraîchissement automatique (5s) et l'horodatage précis des rapports d'export.
 
+mysql-connector-python : Driver officiel permettant la communication sécurisée avec les serveurs MariaDB et MySQL. Il gère l'exécution des requêtes de diagnostic.
 
-Partie de la stdlib Python, donc pas de date de fin.
-Très stable, largement utilisé dans tous les projets Python.
+smbclient : Permet au logiciel d'interagir avec des partages réseau (NAS) via le protocole SMB/CIFS (utilisé pour NAS_CONFIG).
+
+os :  Utilisé pour la manipulation des dossiers système, notamment la création automatique du répertoire /exports.
+
+L'ajout du module requests dans NTL‑SysToolbox permet au logiciel de dépasser le cadre du réseau local pour interagir avec des ressources distantes via le protocole HTTP/HTTPS.
+
+dataclasses (dataclass) : Permet de définir des structures de données (objets) claires et typées pour représenter les équipements et les services. Cela remplace avantageusement les dictionnaires classiques en rendant le code plus lisible, plus facile à maintenir et en réduisant les erreurs de manipulation des données issues de la base SQL.
+
+typing (Optional) : Utilisé pour le "Type Hinting" (indices de type) afin de sécuriser le développement. Le type Optional est crucial pour gérer les données qui peuvent être nulles (None), comme lorsqu'un serveur ne répond pas à une requête de performance, évitant ainsi des plantages lors du traitement des résultats.
+
+ipaddress : Bibliothèque standard utilisée pour la validation et la manipulation des adresses réseaux. Elle garantit que les données importées (via SQL ou CSV) sont des adresses IPv4/IPv6 valides, évitant ainsi des erreurs lors des tests de connectivité ou des scans d'audit.
+
+PyInstaller : Contrairement aux bibliothèques de code, PyInstaller est un utilitaire de packaging "hors-code". Son rôle est de transformer le script Python et toutes ses dépendances (modules, icônes, configurations) en un fichier exécutable unique (.exe). Cela permet de distribuer NTL‑SysToolbox sur des postes de travail n'ayant pas Python installé, garantissant ainsi une portabilité totale et une exécution isolée du système hôte.
+
 
