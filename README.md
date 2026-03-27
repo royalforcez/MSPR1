@@ -46,7 +46,7 @@ NTL-SysToolbox CLI
 
 how to start ?
 
-installer les dépendances : python -m pip install -r requirements.txt
+installer les dépendances : pip install -r requirements.txt
 
 ...\NTLSysToolbox>python main.py
 
