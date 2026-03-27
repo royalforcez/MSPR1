@@ -309,3 +309,12 @@ AttributeError: 'NoneType' object has no attribute 'cursor'
 2026-03-27 19:55:38 [ERROR] Le module 3 a retourné une erreur (Code None)
 2026-03-27 19:55:41 [INFO] Fermeture du menu principal.
 2026-03-27 19:55:41 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 20:05:55 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 20:05:55 [INFO] Affichage du loading_screen...
+2026-03-27 20:05:57 [INFO] loading_screen terminé avec succès.
+2026-03-27 20:05:57 [INFO] Interface UI initialisée.
+2026-03-27 20:05:57 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 20:06:05 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 20:06:06 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 20:06:06 [INFO] Affichage du menu principal.
+2026-03-27 20:06:09 [INFO] Lancement Module Audit

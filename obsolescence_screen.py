@@ -437,35 +437,42 @@ def screen_obsolescence_audit(stdscr):
                     if not assets:
                         raise ValueError("Aucune donnée valide dans le fichier")
 
-                    results = audit_csv_assets(assets, client)
-
-                    stdscr.clear()
-                    stdscr.addstr(3, 4, "Résultat audit CSV")
-
-                    stdscr.addstr(
-                        5,
-                        4,
-                        f"{'HOSTNAME':<20} {'IP':<18} {'OS':<25} {'VERSION':<10} {'EOL DATE':<12} {'STATUT':<12}"
-                    )
-
-                    stdscr.addstr(6, 4, "-" * 100)
-
-                    for i, r in enumerate(results):
-                        if 8 + i >= h - 3:
-                            break
-
-                        stdscr.addstr(
-                            8 + i,
-                            4,
-                            f"{r[0]:<20} {r[1]:<18} {r[2]:<25} {r[3]:<10} {r[4]:<12} {r[5]:<12}"
-                        )
-
-                    wait_with_export(stdscr, results, "csv_audit")
-
                 except ValueError as e:
                     stdscr.addstr(11, 4, f"Erreur : {str(e)}", curses.color_pair(1))
                     stdscr.addstr(13, 4, "Appuyez sur une touche pour continuer")
                     stdscr.getch()
+                    continue
+
+                except Exception:
+                    stdscr.addstr(11, 4, "Erreur inattendue lors de la lecture du CSV", curses.color_pair(1))
+                    stdscr.addstr(13, 4, "Appuyez sur une touche pour continuer")
+                    stdscr.getch()
+                    continue
+
+                results = audit_csv_assets(assets, client)
+
+                stdscr.clear()
+                stdscr.addstr(3, 4, "Résultat audit CSV")
+
+                stdscr.addstr(
+                    5,
+                    4,
+                    f"{'HOSTNAME':<20} {'IP':<18} {'OS':<25} {'VERSION':<10} {'EOL DATE':<12} {'STATUT':<12}"
+                )
+
+                stdscr.addstr(6, 4, "-" * 100)
+
+                for i, r in enumerate(results):
+                    if 8 + i >= h - 3:
+                        break
+
+                    stdscr.addstr(
+                        8 + i,
+                        4,
+                        f"{r[0]:<20} {r[1]:<18} {r[2]:<25} {r[3]:<10} {r[4]:<12} {r[5]:<12}"
+                    )
+
+                wait_with_export(stdscr, results, "csv_audit")
 
             elif current_row == 4:
                 return
