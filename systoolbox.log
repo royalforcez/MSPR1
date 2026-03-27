@@ -653,3 +653,253 @@
 2026-03-27 12:38:14 [INFO] Affichage du menu principal.
 2026-03-27 12:38:16 [INFO] Lancement Module Audit
 2026-03-27 12:39:03 [INFO] Interruption manuelle (Ctrl+C).
+2026-03-27 12:47:54 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 12:47:54 [INFO] Affichage du loading_screen...
+2026-03-27 12:47:55 [INFO] loading_screen terminé avec succès.
+2026-03-27 12:47:55 [INFO] Interface UI initialisée.
+2026-03-27 12:47:55 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 12:48:11 [INFO] Configuration chargée avec succès depuis C:\Users\boula\Downloads\FastPASS.txt
+2026-03-27 12:48:12 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 12:48:12 [INFO] Affichage du menu principal.
+2026-03-27 12:48:39 [INFO] Fermeture du menu principal.
+2026-03-27 12:48:39 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 12:48:50 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 12:48:50 [INFO] Affichage du loading_screen...
+2026-03-27 12:48:51 [INFO] loading_screen terminé avec succès.
+2026-03-27 12:48:51 [INFO] Interface UI initialisée.
+2026-03-27 12:48:51 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 12:49:10 [INFO] Configuration manuelle terminée avec succès.
+2026-03-27 12:49:10 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 12:49:10 [INFO] Affichage du menu principal.
+2026-03-27 12:49:12 [INFO] Lancement Module Audit
+2026-03-27 12:49:37 [INFO] Connexion DB NTL réussie.
+2026-03-27 12:50:30 [INFO] Connexion DB NTL réussie.
+2026-03-27 12:50:54 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 12:55:53 [INFO] Fermeture du menu principal.
+2026-03-27 12:55:53 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 12:56:38 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 12:56:38 [INFO] Affichage du loading_screen...
+2026-03-27 12:56:39 [INFO] loading_screen terminé avec succès.
+2026-03-27 12:56:39 [INFO] Interface UI initialisée.
+2026-03-27 12:56:39 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 12:56:57 [INFO] Configuration manuelle terminée avec succès.
+2026-03-27 12:56:57 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 12:56:57 [INFO] Affichage du menu principal.
+2026-03-27 12:57:00 [INFO] Lancement Module Audit
+2026-03-27 12:57:47 [INFO] Connexion DB NTL réussie.
+2026-03-27 12:57:50 [INFO] Connexion DB NTL réussie.
+2026-03-27 12:57:55 [INFO] Export réussi : audit_db_20260327_125755.csv (6 lignes de données).
+2026-03-27 12:58:04 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 12:58:25 [INFO] Lancement Module Audit
+2026-03-27 12:58:37 [INFO] Connexion DB NTL réussie.
+2026-03-27 12:58:46 [INFO] Export réussi : audit_db_20260327_125846.csv (6 lignes de données).
+2026-03-27 12:59:04 [INFO] Connexion DB NTL réussie.
+2026-03-27 13:03:45 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 13:03:47 [INFO] Fermeture du menu principal.
+2026-03-27 13:03:47 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 13:03:52 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 13:03:52 [INFO] Affichage du loading_screen...
+2026-03-27 13:03:53 [INFO] loading_screen terminé avec succès.
+2026-03-27 13:03:53 [INFO] Interface UI initialisée.
+2026-03-27 13:03:53 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 13:04:17 [INFO] Configuration manuelle terminée avec succès.
+2026-03-27 13:04:17 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 13:04:17 [INFO] Affichage du menu principal.
+2026-03-27 13:04:21 [INFO] Lancement Module Audit
+2026-03-27 13:04:50 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 13:04:51 [INFO] Connexion DB NTL réussie.
+2026-03-27 13:04:51 [INFO] Récupération BDD réussie : 6 équipements actifs trouvés.
+2026-03-27 13:04:58 [INFO] Export réussi : audit_network_20260327_130458.csv (6 lignes de données).
+2026-03-27 13:05:19 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 13:05:19 [INFO] Connexion DB NTL réussie.
+2026-03-27 13:05:19 [INFO] Récupération BDD réussie : 6 équipements actifs trouvés.
+2026-03-27 13:05:27 [INFO] Export réussi : audit_db_20260327_130527.csv (6 lignes de données).
+2026-03-27 13:05:29 [INFO] Export réussi : audit_db_20260327_130529.csv (6 lignes de données).
+2026-03-27 13:05:29 [INFO] Export réussi : audit_db_20260327_130529.csv (6 lignes de données).
+2026-03-27 13:05:57 [ERROR] Colonnes manquantes dans C:\Users\boula\Documents\MSPR\NTLSysToolboxGIT\MSPR1\backups\csv\export_tb_os_20260327_004908.csv : ['hostname', 'ip', 'os_name', 'os_version']
+2026-03-27 13:05:57 [ERROR] Erreur lors de la lecture du CSV C:\Users\boula\Documents\MSPR\NTLSysToolboxGIT\MSPR1\backups\csv\export_tb_os_20260327_004908.csv : Colonnes manquantes : ['hostname', 'ip', 'os_name', 'os_version']
+2026-03-27 13:06:16 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 13:07:03 [INFO] Lancement Module Audit
+2026-03-27 13:07:05 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 13:07:14 [INFO] Lancement Module Audit
+2026-03-27 13:07:15 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 13:07:16 [INFO] Lancement Module Audit
+2026-03-27 13:07:18 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 13:07:26 [INFO] Lancement Module Audit
+2026-03-27 13:07:27 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 13:09:49 [INFO] Fermeture du menu principal.
+2026-03-27 13:09:49 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 13:09:57 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 13:09:57 [INFO] Affichage du loading_screen...
+2026-03-27 13:09:58 [INFO] loading_screen terminé avec succès.
+2026-03-27 13:09:58 [INFO] Interface UI initialisée.
+2026-03-27 13:09:58 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 13:10:05 [WARNING] Tentative de chargement : Fichier introuvable ()
+2026-03-27 13:10:07 [WARNING] Échec F12, passage à la saisie manuelle.
+2026-03-27 13:10:14 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 13:10:14 [INFO] Affichage du loading_screen...
+2026-03-27 13:10:15 [INFO] loading_screen terminé avec succès.
+2026-03-27 13:10:15 [INFO] Interface UI initialisée.
+2026-03-27 13:10:15 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 13:10:33 [INFO] Configuration manuelle terminée avec succès.
+2026-03-27 13:10:33 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 13:10:33 [INFO] Affichage du menu principal.
+2026-03-27 13:10:36 [INFO] Lancement Module Audit
+2026-03-27 13:10:36 [INFO] Entrée dans le module Audit d'Obsolescence.
+2026-03-27 13:10:47 [INFO] Option sélectionnée : Lister les versions d’un OS et leurs dates de fin de vie
+2026-03-27 13:10:56 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 13:10:56 [INFO] Affichage du loading_screen...
+2026-03-27 13:10:57 [INFO] loading_screen terminé avec succès.
+2026-03-27 13:10:57 [INFO] Interface UI initialisée.
+2026-03-27 13:10:57 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 13:11:15 [INFO] Configuration manuelle terminée avec succès.
+2026-03-27 13:11:15 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 13:11:15 [INFO] Affichage du menu principal.
+2026-03-27 13:11:19 [INFO] Lancement Module Audit
+2026-03-27 13:11:19 [INFO] Entrée dans le module Audit d'Obsolescence.
+2026-03-27 13:12:10 [INFO] Option sélectionnée : Lister les versions d’un OS et leurs dates de fin de vie
+2026-03-27 13:12:18 [INFO] Option sélectionnée : Lister les composants d’une plage réseau
+2026-03-27 13:12:31 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 13:12:31 [INFO] Connexion DB NTL réussie.
+2026-03-27 13:12:31 [INFO] Récupération BDD réussie : 6 équipements actifs trouvés.
+2026-03-27 13:12:31 [INFO] Filtrage réseau 192.168.1.254/24 : 6/6 équipements retenus.
+2026-03-27 13:12:35 [INFO] Export réussi : audit_network_20260327_131235.csv (6 lignes de données).
+2026-03-27 13:12:37 [INFO] Option sélectionnée : Lancer un audit depuis la base de données
+2026-03-27 13:12:37 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 13:12:37 [INFO] Connexion DB NTL réussie.
+2026-03-27 13:12:37 [INFO] Récupération BDD réussie : 6 équipements actifs trouvés.
+2026-03-27 13:12:37 [INFO] Export réussi : audit_db_audit_20260327_131237.csv (6 lignes de données).
+2026-03-27 13:12:45 [INFO] Option sélectionnée : Lancer un audit depuis un fichier CSV
+2026-03-27 13:12:51 [ERROR] Fichier introuvable pour lecture : 
+2026-03-27 13:18:03 [INFO] Utilisateur a quitté le module via ESC.
+2026-03-27 13:18:03 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 13:18:04 [INFO] Fermeture du menu principal.
+2026-03-27 13:18:04 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 13:18:08 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 13:18:08 [INFO] Affichage du loading_screen...
+2026-03-27 13:18:09 [INFO] loading_screen terminé avec succès.
+2026-03-27 13:18:09 [INFO] Interface UI initialisée.
+2026-03-27 13:18:09 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 13:18:27 [INFO] Configuration manuelle terminée avec succès.
+2026-03-27 13:18:27 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 13:18:27 [INFO] Affichage du menu principal.
+2026-03-27 13:18:40 [INFO] Lancement Module Audit
+2026-03-27 13:18:40 [INFO] Entrée dans le module Audit d'Obsolescence.
+2026-03-27 13:18:53 [INFO] Utilisateur a quitté le module via ESC.
+2026-03-27 13:18:53 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 13:18:54 [INFO] Lancement Module Audit
+2026-03-27 13:18:54 [INFO] Entrée dans le module Audit d'Obsolescence.
+2026-03-27 13:18:56 [INFO] Option sélectionnée : Lancer un audit depuis la base de données
+2026-03-27 13:18:56 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 13:18:56 [INFO] Connexion DB NTL réussie.
+2026-03-27 13:18:56 [INFO] Récupération BDD réussie : 6 équipements actifs trouvés.
+2026-03-27 13:18:56 [INFO] Export réussi : audit_db_audit_20260327_131856.csv (6 lignes de données).
+2026-03-27 13:20:27 [INFO] Utilisateur a quitté le module via ESC.
+2026-03-27 13:20:27 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 13:20:29 [INFO] Fermeture du menu principal.
+2026-03-27 13:20:29 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 13:20:35 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 13:20:35 [INFO] Affichage du loading_screen...
+2026-03-27 13:20:36 [INFO] loading_screen terminé avec succès.
+2026-03-27 13:20:36 [INFO] Interface UI initialisée.
+2026-03-27 13:20:36 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 13:20:53 [INFO] Configuration manuelle terminée avec succès.
+2026-03-27 13:20:53 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 13:20:53 [INFO] Affichage du menu principal.
+2026-03-27 13:20:55 [INFO] Lancement Module Audit
+2026-03-27 13:20:55 [INFO] Entrée dans le module Audit d'Obsolescence.
+2026-03-27 13:21:02 [INFO] Exécution de : Lister les versions d’un OS et leurs dates de fin de vie
+2026-03-27 13:21:11 [INFO] Exécution de : Lister les composants d’une plage réseau
+2026-03-27 13:21:25 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 13:21:25 [INFO] Connexion DB NTL réussie.
+2026-03-27 13:21:25 [INFO] Récupération BDD réussie : 6 équipements actifs trouvés.
+2026-03-27 13:21:25 [INFO] Filtrage réseau 192.168.1.254/24 : 6/6 équipements retenus.
+2026-03-27 13:21:27 [INFO] Export réussi : audit_network_20260327_132127.csv (6 lignes de données).
+2026-03-27 13:21:29 [INFO] Exécution de : Lancer un audit depuis la base de données
+2026-03-27 13:21:29 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 13:21:29 [INFO] Connexion DB NTL réussie.
+2026-03-27 13:21:29 [INFO] Récupération BDD réussie : 6 équipements actifs trouvés.
+2026-03-27 13:21:29 [INFO] Export réussi : audit_db_audit_20260327_132129.csv (6 lignes de données).
+2026-03-27 13:21:35 [INFO] Exécution de : Lancer un audit depuis la base de données
+2026-03-27 13:21:35 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 13:21:35 [INFO] Connexion DB NTL réussie.
+2026-03-27 13:21:35 [INFO] Récupération BDD réussie : 6 équipements actifs trouvés.
+2026-03-27 13:21:35 [INFO] Export réussi : audit_db_audit_20260327_132135.csv (6 lignes de données).
+2026-03-27 13:21:57 [INFO] Exécution de : Lancer un audit depuis un fichier CSV
+2026-03-27 13:22:01 [ERROR] Colonnes manquantes dans C:\Users\boula\Documents\MSPR\NTLSysToolboxGIT\MSPR1\exports\audit_network_20260327_132127.csv : ['hostname', 'ip', 'os_name', 'os_version']
+2026-03-27 13:22:01 [ERROR] Erreur lors de la lecture du CSV C:\Users\boula\Documents\MSPR\NTLSysToolboxGIT\MSPR1\exports\audit_network_20260327_132127.csv : Colonnes manquantes : ['hostname', 'ip', 'os_name', 'os_version']
+2026-03-27 13:22:07 [INFO] Exécution de : Retour au menu principal
+2026-03-27 13:22:07 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 13:22:10 [INFO] Lancement Module Audit
+2026-03-27 13:22:10 [INFO] Entrée dans le module Audit d'Obsolescence.
+2026-03-27 13:22:11 [INFO] Sortie du module via touche ESC.
+2026-03-27 13:22:11 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 13:22:12 [INFO] Lancement Module Sauvegarde
+2026-03-27 13:22:14 [INFO] Retour au menu principal depuis module 2
+2026-03-27 13:22:15 [INFO] Lancement Module Diagnostic
+2026-03-27 13:22:15 [INFO] Entrée dans le module Diagnostic.
+2026-03-27 13:22:15 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:22:15 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:22:17 [INFO] Changement d'onglet : F2
+2026-03-27 13:22:18 [INFO] Changement d'onglet : F1
+2026-03-27 13:22:19 [INFO] Changement d'onglet : F2
+2026-03-27 13:22:19 [INFO] Changement d'onglet : F1
+2026-03-27 13:22:20 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:22:20 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:22:22 [INFO] Export réussi : exports/diag_gen_20260327_132222.json
+2026-03-27 13:22:25 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:22:25 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:22:30 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:22:30 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:22:35 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:22:35 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:22:40 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:22:40 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:22:45 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:22:45 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:22:50 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:22:50 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:22:55 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:22:55 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:23:00 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:23:01 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:23:05 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:23:06 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:23:10 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:23:11 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:23:16 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:23:16 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:23:21 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:23:21 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:23:26 [INFO] Récupération de 14 équipements depuis la base NTL.
+2026-03-27 13:23:26 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 13:23:26 [INFO] Sortie du module Diagnostic vers Home.
+2026-03-27 13:23:26 [INFO] Retour au menu principal depuis module 1
+2026-03-27 13:25:15 [INFO] Fermeture du menu principal.
+2026-03-27 13:25:15 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 13:25:33 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 13:25:33 [INFO] Affichage du loading_screen...
+2026-03-27 13:25:34 [INFO] loading_screen terminé avec succès.
+2026-03-27 13:25:34 [INFO] Interface UI initialisée.
+2026-03-27 13:25:34 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 13:25:57 [INFO] Configuration manuelle terminée avec succès.
+2026-03-27 13:25:57 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 13:25:57 [INFO] Affichage du menu principal.
+2026-03-27 13:26:25 [INFO] Lancement Module Sauvegarde
+2026-03-27 13:26:27 [INFO] Retour au menu principal depuis module 2
+2026-03-27 13:26:28 [INFO] Lancement Module Audit
+2026-03-27 13:26:28 [INFO] Entrée dans le module Audit d'Obsolescence.
+2026-03-27 13:26:29 [INFO] Exécution de : Lister les versions d’un OS et leurs dates de fin de vie
+2026-03-27 13:26:39 [INFO] Exécution de : Lister les versions d’un OS et leurs dates de fin de vie
+2026-03-27 13:26:47 [INFO] Exécution de : Lister les composants d’une plage réseau
+2026-03-27 13:27:11 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 13:27:11 [INFO] Connexion DB NTL réussie.
+2026-03-27 13:27:11 [INFO] Récupération BDD réussie : 6 équipements actifs trouvés.
+2026-03-27 13:27:11 [INFO] Filtrage réseau 192.168.1.254/24 : 6/6 équipements retenus.
+2026-03-27 13:27:13 [INFO] Export réussi : backups\csv\network_20260327_132713.csv
+2026-03-27 13:27:16 [INFO] Exécution de : Lancer un audit depuis la base de données
+2026-03-27 13:27:16 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 13:27:16 [INFO] Connexion DB NTL réussie.
+2026-03-27 13:27:16 [INFO] Récupération BDD réussie : 6 équipements actifs trouvés.
+2026-03-27 13:27:16 [INFO] Export réussi : backups\csv\db_audit_20260327_132716.csv
+2026-03-27 13:27:22 [INFO] Exécution de : Lancer un audit depuis un fichier CSV
