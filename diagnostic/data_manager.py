@@ -1,10 +1,13 @@
 import mysql.connector
+import logging
 from session_manager import DB_NTL, DB_ENTREPRISE
 
 def get_db_data():
-    """Récupère les données consolidées incluant le disque."""
+    """Récupère les données consolidées. Retourne une liste (succès) ou un code erreur (int)."""
+    conn = None
     try:
-        conn = mysql.connector.connect(**DB_NTL)
+        # On tente la connexion avec un timeout court pour ne pas figer l'UI
+        conn = mysql.connector.connect(**DB_NTL, connect_timeout=3)
         cursor = conn.cursor(dictionary=True)
         
         query = """
@@ -31,13 +34,21 @@ def get_db_data():
         cursor.execute(query)
         rows = cursor.fetchall()
         cursor.close()
-        conn.close()
+        logging.info(f"Récupération de {len(rows)} équipements depuis la base NTL.")
         return rows
+
+    except mysql.connector.Error as err:
+        logging.error(f"Erreur SQL (get_db_data) : {err.msg} (Code: {err.errno})")
+        return 1 # Code erreur pour problème SQL
     except Exception as e:
-        return f"Erreur de lecture : {str(e)}"
+        logging.error(f"Erreur inattendue (get_db_data) : {str(e)}")
+        return 2 # Autre erreur
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
 
 def check_db_health():
-    """Vérifie le statut des deux bases de données."""
+    """Vérifie le statut des bases. Retourne un dict avec statuts et messages logués."""
     results = {
         "ntl": (False, "Injoignable"),
         "entreprise": (False, "Injoignable")
@@ -50,6 +61,7 @@ def check_db_health():
             results["ntl"] = (True, "ONLINE (ntlsystools)")
             conn.close()
     except Exception as e:
+        logging.warning(f"Santé NTL : ÉCHEC - {str(e)[:50]}")
         results["ntl"] = (False, f"Erreur : {str(e)[:20]}")
 
     # Test ENTREPRISE
@@ -59,20 +71,18 @@ def check_db_health():
             results["entreprise"] = (True, f"ONLINE ({DB_ENTREPRISE['database']})")
             conn.close()
     except Exception as e:
+        logging.warning(f"Santé Entreprise : ÉCHEC - {str(e)[:50]}")
         results["entreprise"] = (False, f"Erreur : {str(e)[:20]}")
 
     return results
 
 def get_services_data():
-    """Récupère le dernier état AD/DNS, trié par nom de serveur (ex: DC01, DC02)."""
+    """Récupère l'état AD/DNS. Retourne un dict (succès) ou un dict vide (échec)."""
     statuses = {}
+    conn = None
     try:
-        from session_manager import DB_NTL
-        import mysql.connector
-        
-        conn = mysql.connector.connect(**DB_NTL)
+        conn = mysql.connector.connect(**DB_NTL, connect_timeout=3)
         cursor = conn.cursor(dictionary=True)
-        
         
         query = """
         SELECT e.nom AS equipement, s.nom_service, s.etat
@@ -89,7 +99,6 @@ def get_services_data():
         cursor.execute(query)
         rows = cursor.fetchall()
         
-        
         for row in rows:
             server = row['equipement']
             service = row['nom_service']
@@ -98,8 +107,12 @@ def get_services_data():
             statuses[server][service] = row['etat']
             
         cursor.close()
-        conn.close()
+        logging.info("Données des services AD/DNS récupérées.")
     except Exception as e:
-        pass
+        logging.error(f"Erreur lors de la récupération des services : {e}")
+        # On retourne un dict vide, le module de diagnostic saura qu'il n'y a rien à afficher
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
         
     return statuses
