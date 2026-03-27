@@ -63,21 +63,27 @@ def get_status(eol_date):
         return "INCONNU"
 
     try:
+        today = datetime.today().date()
+
+        # Si string → conversion
         if isinstance(eol_date, str):
-            eol = datetime.strptime(eol_date, "%Y-%m-%d")
+            eol = datetime.strptime(eol_date, "%Y-%m-%d").date()
+
+        # Si déjà date → OK
         else:
             eol = eol_date
 
-        today = datetime.today()
         diff = (eol - today).days
 
         if diff < 0:
             return "OBSOLETE"
+
         if diff < 365:
             return "EOL < 1 AN"
+
         return "SUPPORTE"
 
-    except:
+    except Exception as e:
         return "INCONNU"
 
 
