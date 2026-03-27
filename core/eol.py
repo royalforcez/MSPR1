@@ -12,37 +12,28 @@ EOL_API_BASE = "https://endoflife.date/api/v1"
 # NORMALISATION
 # =====================================================
 
-def normalize_os(os_name):
-    if not os_name:
-        return None
-
-    os_name = os_name.lower()
-
-    if "debian" in os_name:
-        return "debian"
-
-    if "windows server" in os_name:
-        return "windows-server"
-
-    if "ubuntu" in os_name:
-        return "ubuntu"
-
-    return None
-
-
 def normalize_version(version, os_name=None):
     if not version:
         return None
 
-    if os_name and "windows server" in os_name.lower():
-        match = re.search(r"\b(20\d{2})\b", os_name)
-        if match:
-            return match.group(1)
+    version = str(version).strip()
 
-    version = str(version)
+    if os_name:
+        os_name = os_name.lower()
 
-    if "." in version:
-        return version.split(".")[0]
+        # Windows Server
+        if "windows server" in os_name:
+            match = re.search(r"\b(20\d{2})\b", os_name)
+            if match:
+                return match.group(1)
+
+        # Debian
+        if "debian" in os_name:
+            return version.split(".")[0]
+
+        # Ubuntu
+        if "ubuntu" in os_name:
+            return version 
 
     return version
 
