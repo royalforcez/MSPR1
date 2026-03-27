@@ -318,3 +318,59 @@ AttributeError: 'NoneType' object has no attribute 'cursor'
 2026-03-27 20:06:06 [INFO] Utilisateur authentifié. Accès Home.
 2026-03-27 20:06:06 [INFO] Affichage du menu principal.
 2026-03-27 20:06:09 [INFO] Lancement Module Audit
+2026-03-27 20:08:28 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 20:08:28 [INFO] Affichage du loading_screen...
+2026-03-27 20:08:30 [INFO] loading_screen terminé avec succès.
+2026-03-27 20:08:30 [INFO] Interface UI initialisée.
+2026-03-27 20:08:30 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 20:08:37 [ERROR] Saisie incomplète : l'hôte NTL est vide.
+2026-03-27 20:08:37 [WARNING] Sortie : Authentification échouée ou annulée (Code: 1)
+2026-03-27 20:08:46 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 20:08:46 [INFO] Affichage du loading_screen...
+2026-03-27 20:08:48 [INFO] loading_screen terminé avec succès.
+2026-03-27 20:08:48 [INFO] Interface UI initialisée.
+2026-03-27 20:08:48 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 20:09:04 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 20:09:05 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 20:09:05 [INFO] Affichage du menu principal.
+2026-03-27 20:09:08 [INFO] Lancement Module Audit
+2026-03-27 20:09:38 [ERROR] Échec de connexion DB NTL : 2003 (HY000): Can't connect to MySQL server on '192.168.1.138:3306' (10060)
+2026-03-27 20:09:38 [ERROR] Erreur dans le menu principal : 'NoneType' object has no attribute 'cursor'
+2026-03-27 20:09:38 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 20:09:45 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 20:09:45 [INFO] Affichage du loading_screen...
+2026-03-27 20:09:47 [INFO] loading_screen terminé avec succès.
+2026-03-27 20:09:47 [INFO] Interface UI initialisée.
+2026-03-27 20:09:47 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 20:09:50 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 20:09:51 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 20:09:51 [INFO] Affichage du menu principal.
+2026-03-27 20:09:53 [INFO] Lancement Module Audit
+2026-03-27 20:10:16 [ERROR] Échec de connexion DB NTL : 2003 (HY000): Can't connect to MySQL server on '192.168.1.138:3306' (10060)
+2026-03-27 20:10:16 [ERROR] Erreur dans le menu principal : 'NoneType' object has no attribute 'cursor'
+2026-03-27 20:10:16 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 20:20:00 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 20:20:00 [INFO] Affichage du loading_screen...
+2026-03-27 20:20:01 [INFO] loading_screen terminé avec succès.
+2026-03-27 20:20:01 [INFO] Interface UI initialisée.
+2026-03-27 20:20:01 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 20:20:05 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 20:20:06 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 20:20:06 [INFO] Affichage du menu principal.
+2026-03-27 20:20:08 [INFO] Lancement Module Audit
+2026-03-27 20:26:21 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 20:26:21 [INFO] Affichage du loading_screen...
+2026-03-27 20:26:22 [INFO] loading_screen terminé avec succès.
+2026-03-27 20:26:22 [INFO] Interface UI initialisée.
+2026-03-27 20:26:22 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 20:26:28 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 20:26:29 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 20:26:29 [INFO] Affichage du menu principal.
+2026-03-27 20:26:32 [INFO] Lancement Module Audit
+2026-03-27 20:26:57 [ERROR] Échec de connexion DB NTL : 2003 (HY000): Can't connect to MySQL server on '192.168.1.138:3306' (10060)
+2026-03-27 20:26:57 [ERROR] Erreur BDD : 'NoneType' object has no attribute 'cursor'
+2026-03-27 20:27:45 [ERROR] Échec de connexion DB NTL : 2003 (HY000): Can't connect to MySQL server on '192.168.1.138:3306' (10060)
+2026-03-27 20:27:45 [ERROR] Erreur BDD : 'NoneType' object has no attribute 'cursor'
+2026-03-27 20:29:16 [INFO] Connexion DB NTL réussie.
+2026-03-27 20:29:28 [INFO] Connexion DB NTL réussie.
+2026-03-27 20:29:35 [ERROR] Le module 3 a retourné une erreur (Code None)

@@ -139,23 +139,27 @@ def extract_eol_date(release):
 # =====================================================
 
 def fetch_all_assets():
+    try:
+        conn = get_db_connection_ntl()
+        cursor = conn.cursor()
 
-    conn = get_db_connection_ntl()
-    cursor = conn.cursor()
+        cursor.execute("""
+            SELECT 
+                e.nom, e.ipv4, o.nom_os, o.version_os, el.date_expiration
+            FROM tb_equipements e
+            JOIN tb_os o ON e.id_os = o.id
+            LEFT JOIN tb_end_of_life el ON o.id = el.id_os
+            WHERE e.est_actif = 1
+        """)
 
-    cursor.execute("""
-        SELECT 
-            e.nom, e.ipv4, o.nom_os, o.version_os, el.date_expiration
-        FROM tb_equipements e
-        JOIN tb_os o ON e.id_os = o.id
-        LEFT JOIN tb_end_of_life el ON o.id = el.id_os
-        WHERE e.est_actif = 1
-    """)
+        rows = cursor.fetchall()
+        conn.close()
 
-    rows = cursor.fetchall()
-    conn.close()
+        return rows
 
-    return rows
+    except Exception as e:
+        logging.error(f"Erreur BDD : {e}")
+        raise ValueError("Impossible de se connecter à la base de données")
 
 
 # =====================================================
@@ -254,6 +258,12 @@ def wait_with_export(stdscr, results, prefix):
             stdscr.addstr(h - 3, 4, "Erreur export", curses.color_pair(1))
 
         stdscr.getch()
+
+    elif key == 27:
+        return
+
+    else:
+        return
 
 # =====================================================
 # INPUT UTILISATEUR (PROPRE)
@@ -368,8 +378,13 @@ def screen_obsolescence_audit(stdscr):
                 stdscr.clear()
 
                 cidr = get_input(stdscr,5,4,"Réseau CIDR (ex: 192.168.1.0/24): ")
-
-                rows = fetch_all_assets()
+                try:
+                    rows = fetch_all_assets()
+                except ValueError as e:
+                    stdscr.addstr(7, 4, str(e), curses.color_pair(1))
+                    stdscr.addstr(9, 4, "Appuyez sur une touche...")
+                    stdscr.getch()
+                    continue
                 filtered = filter_by_network(cidr, rows)
 
                 results = [[r[0], r[1], r[2], r[3], "N/A", "INCONNU"] for r in filtered]
@@ -396,8 +411,16 @@ def screen_obsolescence_audit(stdscr):
                 stdscr.clear()
                 stdscr.addstr(5, 4, "Audit en cours...")
                 stdscr.refresh()
+                
+                try:
+                    data = fetch_all_assets()
+                except ValueError as e:
+                    stdscr.clear()
+                    stdscr.addstr(5, 4, str(e), curses.color_pair(1))
+                    stdscr.addstr(7, 4, "Appuyez sur une touche...")
+                    stdscr.getch()
+                    continue
 
-                data = fetch_all_assets()
                 results = [[r[0], r[1], r[2], r[3], str(r[4]), get_status(r[4])] for r in data]
 
                 stdscr.clear()
