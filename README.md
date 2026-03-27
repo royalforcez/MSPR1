@@ -16,37 +16,29 @@
 Arborescence :
 
 
-NTL‑SysToolbox CLI
-├── _pycache_
+```
+NTL-SysToolbox CLI
+├── __pycache__
 ├── assets
-├── build/NTLsystoolbox
 ├── diagnostic
-|	├── data_manager.py
-|	├── diagnostic_view.py
-|	└── services.py
-├── dist
-|	└── NTLsystoolbox.exe
-├── exports
+│   ├── data_manager.py
+│   ├── diagnostic_view.py
+│   └── services.py
 ├── obsolescence
-|	├── _init_.py
-|	├── audit_csv.py
-|	├── audit_db.py
-|	├── audit_engine.py
-|	├── eol_api.py
-|	├── models.py
-|	├── obsolescence.py
-|	├── reports.py
-|	└── utils.py
+│   ├── __init__.py
+│   └── eol_api.py
 ├── .gitignore
-├── NTLsystoolbox.spec
-├── README.md
 ├── diagnostic_module.py
 ├── home.py
+├── Lancer_Toolbox.bat
 ├── main.py
+├── obsolescence_screen.py
+├── README.md
 ├── requirements.txt
 ├── session_manager.py
 ├── ui.py
 └── wms_backup.py
+```
 
 
 
