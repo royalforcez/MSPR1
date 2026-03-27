@@ -59,17 +59,23 @@ def export_json(data, prefix="audit"):
 
 def get_status(eol_date):
 
-    if not eol_date or eol_date == "N/A":
+    if not eol_date or eol_date in ("N/A", "", "None"):
         return "INCONNU"
 
     try:
         today = datetime.today().date()
 
-        # Si string → conversion
         if isinstance(eol_date, str):
-            eol = datetime.strptime(eol_date, "%Y-%m-%d").date()
+            eol_date = eol_date.strip()
 
-        # Si déjà date → OK
+            for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%d-%m-%Y"):
+                try:
+                    eol = datetime.strptime(eol_date, fmt).date()
+                    break
+                except:
+                    continue
+            else:
+                return "INCONNU"
         else:
             eol = eol_date
 
@@ -83,7 +89,7 @@ def get_status(eol_date):
 
         return "SUPPORTE"
 
-    except Exception as e:
+    except:
         return "INCONNU"
 
 
@@ -107,20 +113,27 @@ def normalize_os(os_name):
 def normalize_version(version, os_name=None):
     if not version:
         return None
+    
+    version = str(version).strip()
 
-    try:
-        if os_name and "windows server" in os_name.lower():
+    if os_name:
+        os_name = os_name.lower()
+
+        # Windows Server
+        if "windows server" in os_name:
             match = re.search(r"\b(20\d{2})\b", os_name)
             if match:
                 return match.group(1)
 
-        version = str(version).strip()
-        if "." in version:
+        # Debian → version majeure
+        if "debian" in os_name:
             return version.split(".")[0]
-        return version
 
-    except:
-        return None
+        # Ubuntu → NE PAS MODIFIER
+        if "ubuntu" in os_name:
+            return version
+
+    return version
 
 
 def extract_eol_date(release):
