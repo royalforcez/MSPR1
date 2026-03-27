@@ -68,7 +68,14 @@ def get_releases(product):
         raise RuntimeError(f"Erreur API pour {product}")
 
     data = r.json()
-    return (data.get("result") or {}).get("releases") or []
+
+    if isinstance(data, list):
+        return data
+
+    if isinstance(data, dict):
+        return (data.get("result") or {}).get("releases") or []
+
+    return []
 
 
 # =====================================================
@@ -146,7 +153,7 @@ def run_eol_feed():
             for r in releases:
                 cycle = str(r.get("cycle") or r.get("name"))
 
-                if cycle == version:
+                if str(cycle).strip() == str(version).strip():
                     matched = r
                     break
 
