@@ -1,0 +1,311 @@
+2026-03-27 18:01:02 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 18:01:02 [INFO] Affichage du loading_screen...
+2026-03-27 18:01:03 [INFO] loading_screen terminé avec succès.
+2026-03-27 18:01:03 [INFO] Interface UI initialisée.
+2026-03-27 18:01:03 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 18:01:16 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 18:01:17 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 18:01:17 [INFO] Affichage du menu principal.
+2026-03-27 18:01:19 [INFO] Lancement Module Audit
+2026-03-27 18:01:19 [INFO] Entrée dans le module Audit d'Obsolescence.
+2026-03-27 18:01:22 [INFO] Exécution de : Lister les versions d’un OS et leurs dates de fin de vie
+2026-03-27 18:01:29 [INFO] Exécution de : Lister les composants d’une plage réseau
+2026-03-27 18:01:41 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 18:02:02 [ERROR] Échec de connexion DB NTL : 2003 (HY000): Can't connect to MySQL server on '192.168.1.138:3306' (10060)
+2026-03-27 18:02:02 [ERROR] ECHEC FETCH BDD : 'NoneType' object has no attribute 'cursor'
+Traceback (most recent call last):
+  File "D:\EPSI\Bachelor\MSPR 1\Git\MSPR1\obsolescence_screen.py", line 151, in fetch_all_assets
+    cursor = conn.cursor()
+             ^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'cursor'
+2026-03-27 18:02:52 [INFO] Exécution de : Lancer un audit depuis la base de données
+2026-03-27 18:02:52 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 18:02:52 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:02:52 [INFO] Récupération BDD réussie : 8 équipements actifs trouvés.
+2026-03-27 18:02:52 [WARNING] Format de date invalide ou calcul impossible pour '2026-06-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:02:52 [WARNING] Format de date invalide ou calcul impossible pour '2026-06-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:02:52 [WARNING] Format de date invalide ou calcul impossible pour '2028-08-09' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:02:52 [WARNING] Format de date invalide ou calcul impossible pour '2028-08-09' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:02:52 [WARNING] Format de date invalide ou calcul impossible pour '2034-10-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:02:52 [WARNING] Format de date invalide ou calcul impossible pour '2034-10-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:02:52 [INFO] Export réussi : backups\csv\db_audit_20260327_180252.csv
+2026-03-27 18:03:02 [INFO] Exécution de : Lancer un audit depuis la base de données
+2026-03-27 18:03:02 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 18:03:02 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:03:02 [INFO] Récupération BDD réussie : 8 équipements actifs trouvés.
+2026-03-27 18:03:02 [WARNING] Format de date invalide ou calcul impossible pour '2026-06-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:03:02 [WARNING] Format de date invalide ou calcul impossible pour '2026-06-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:03:02 [WARNING] Format de date invalide ou calcul impossible pour '2028-08-09' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:03:02 [WARNING] Format de date invalide ou calcul impossible pour '2028-08-09' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:03:02 [WARNING] Format de date invalide ou calcul impossible pour '2034-10-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:03:02 [WARNING] Format de date invalide ou calcul impossible pour '2034-10-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:03:02 [INFO] Export réussi : backups\csv\db_audit_20260327_180302.csv
+2026-03-27 18:03:24 [INFO] Exécution de : Lister les composants d’une plage réseau
+2026-03-27 18:03:34 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 18:03:34 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:03:34 [INFO] Récupération BDD réussie : 8 équipements actifs trouvés.
+2026-03-27 18:03:34 [INFO] Filtrage réseau 192.168.0.0/24 : 0/8 équipements retenus.
+2026-03-27 18:04:14 [INFO] Exécution de : Lancer un audit depuis la base de données
+2026-03-27 18:04:14 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 18:04:14 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:04:14 [INFO] Récupération BDD réussie : 8 équipements actifs trouvés.
+2026-03-27 18:04:14 [WARNING] Format de date invalide ou calcul impossible pour '2026-06-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:04:14 [WARNING] Format de date invalide ou calcul impossible pour '2026-06-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:04:14 [WARNING] Format de date invalide ou calcul impossible pour '2028-08-09' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:04:14 [WARNING] Format de date invalide ou calcul impossible pour '2028-08-09' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:04:14 [WARNING] Format de date invalide ou calcul impossible pour '2034-10-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:04:14 [WARNING] Format de date invalide ou calcul impossible pour '2034-10-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:04:14 [INFO] Export réussi : backups\csv\db_audit_20260327_180414.csv
+2026-03-27 18:04:17 [INFO] Exécution de : Lister les composants d’une plage réseau
+2026-03-27 18:04:18 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 18:04:18 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:04:18 [INFO] Récupération BDD réussie : 8 équipements actifs trouvés.
+2026-03-27 18:04:18 [ERROR] Format de réseau CIDR invalide :  ('' does not appear to be an IPv4 or IPv6 network)
+2026-03-27 18:04:26 [INFO] Exécution de : Lancer un audit depuis la base de données
+2026-03-27 18:04:26 [INFO] Tentative de connexion à la BDD NTL...
+2026-03-27 18:04:26 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:04:26 [INFO] Récupération BDD réussie : 8 équipements actifs trouvés.
+2026-03-27 18:04:26 [WARNING] Format de date invalide ou calcul impossible pour '2026-06-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:04:26 [WARNING] Format de date invalide ou calcul impossible pour '2026-06-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:04:26 [WARNING] Format de date invalide ou calcul impossible pour '2028-08-09' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:04:26 [WARNING] Format de date invalide ou calcul impossible pour '2028-08-09' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:04:26 [WARNING] Format de date invalide ou calcul impossible pour '2034-10-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:04:26 [WARNING] Format de date invalide ou calcul impossible pour '2034-10-10' : unsupported operand type(s) for -: 'datetime.date' and 'datetime.datetime'
+2026-03-27 18:04:26 [INFO] Export réussi : backups\csv\db_audit_20260327_180426.csv
+2026-03-27 18:12:24 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 18:12:24 [INFO] Affichage du loading_screen...
+2026-03-27 18:12:25 [INFO] loading_screen terminé avec succès.
+2026-03-27 18:12:25 [INFO] Interface UI initialisée.
+2026-03-27 18:12:25 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 18:12:31 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 18:12:32 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 18:12:32 [INFO] Affichage du menu principal.
+2026-03-27 18:12:33 [INFO] Lancement Module Audit
+2026-03-27 18:12:33 [ERROR] Erreur dans le menu principal : name 'logging' is not defined
+2026-03-27 18:12:33 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 18:12:47 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 18:12:47 [INFO] Affichage du loading_screen...
+2026-03-27 18:12:49 [INFO] loading_screen terminé avec succès.
+2026-03-27 18:12:49 [INFO] Interface UI initialisée.
+2026-03-27 18:12:49 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 18:12:55 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 18:12:56 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 18:12:56 [INFO] Affichage du menu principal.
+2026-03-27 18:12:58 [INFO] Lancement Module Audit
+2026-03-27 18:12:58 [ERROR] Erreur dans le menu principal : name 'logging' is not defined
+2026-03-27 18:12:58 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 18:15:30 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 18:15:30 [INFO] Affichage du loading_screen...
+2026-03-27 18:15:32 [INFO] loading_screen terminé avec succès.
+2026-03-27 18:15:32 [INFO] Interface UI initialisée.
+2026-03-27 18:15:32 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 18:15:37 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 18:15:38 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 18:15:38 [INFO] Affichage du menu principal.
+2026-03-27 18:15:41 [INFO] Lancement Module Audit
+2026-03-27 18:16:10 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:16:21 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:16:52 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 18:16:57 [INFO] Lancement Module Audit
+2026-03-27 18:20:38 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 18:20:38 [INFO] Affichage du loading_screen...
+2026-03-27 18:20:39 [INFO] loading_screen terminé avec succès.
+2026-03-27 18:20:39 [INFO] Interface UI initialisée.
+2026-03-27 18:20:39 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 18:20:46 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 18:20:47 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 18:20:47 [INFO] Affichage du menu principal.
+2026-03-27 18:20:49 [INFO] Lancement Module Audit
+2026-03-27 18:33:11 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 18:33:11 [INFO] Affichage du loading_screen...
+2026-03-27 18:33:13 [INFO] loading_screen terminé avec succès.
+2026-03-27 18:33:13 [INFO] Interface UI initialisée.
+2026-03-27 18:33:13 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 18:33:20 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 18:33:21 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 18:33:21 [INFO] Affichage du menu principal.
+2026-03-27 18:33:22 [INFO] Lancement Module Audit
+2026-03-27 18:33:42 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:34:07 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:34:40 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 18:34:42 [INFO] Lancement Module Audit
+2026-03-27 18:34:50 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:34:50 [ERROR] Erreur dans le menu principal : '\x1b' does not appear to be an IPv4 or IPv6 network
+2026-03-27 18:34:50 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 18:42:38 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 18:42:38 [INFO] Affichage du loading_screen...
+2026-03-27 18:42:39 [INFO] loading_screen terminé avec succès.
+2026-03-27 18:42:39 [INFO] Interface UI initialisée.
+2026-03-27 18:42:39 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 18:42:51 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 18:42:52 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 18:42:52 [INFO] Affichage du menu principal.
+2026-03-27 18:42:54 [INFO] Lancement Module Audit
+2026-03-27 18:43:12 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:43:26 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:48:48 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:53:47 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 18:53:47 [INFO] Affichage du loading_screen...
+2026-03-27 18:53:48 [INFO] loading_screen terminé avec succès.
+2026-03-27 18:53:48 [INFO] Interface UI initialisée.
+2026-03-27 18:53:48 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 18:54:02 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 18:54:03 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 18:54:03 [INFO] Affichage du menu principal.
+2026-03-27 18:54:07 [INFO] Lancement Module Audit
+2026-03-27 18:54:30 [INFO] Connexion DB NTL réussie.
+2026-03-27 18:55:22 [ERROR] Erreur dans le menu principal : [Errno 2] No such file or directory: 'C:\\Users\\Marcel\\Desktop\\audit_network_20260326_223'
+2026-03-27 18:55:22 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 18:56:15 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 18:56:15 [INFO] Affichage du loading_screen...
+2026-03-27 18:56:16 [INFO] loading_screen terminé avec succès.
+2026-03-27 18:56:16 [INFO] Interface UI initialisée.
+2026-03-27 18:56:16 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 18:56:20 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 18:56:21 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 18:56:21 [INFO] Affichage du menu principal.
+2026-03-27 18:56:23 [INFO] Lancement Module Audit
+2026-03-27 19:05:22 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:05:22 [INFO] Affichage du loading_screen...
+2026-03-27 19:05:24 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:05:24 [INFO] Interface UI initialisée.
+2026-03-27 19:05:24 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:05:29 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 19:05:30 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 19:05:30 [INFO] Affichage du menu principal.
+2026-03-27 19:05:31 [INFO] Lancement Module Audit
+2026-03-27 19:05:47 [INFO] Connexion DB NTL réussie.
+2026-03-27 19:09:37 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:09:37 [INFO] Affichage du loading_screen...
+2026-03-27 19:09:38 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:09:38 [INFO] Interface UI initialisée.
+2026-03-27 19:09:38 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:09:43 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 19:09:44 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 19:09:44 [INFO] Affichage du menu principal.
+2026-03-27 19:09:46 [INFO] Lancement Module Audit
+2026-03-27 19:09:55 [INFO] Connexion DB NTL réussie.
+2026-03-27 19:19:41 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:19:41 [INFO] Affichage du loading_screen...
+2026-03-27 19:19:42 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:19:42 [INFO] Interface UI initialisée.
+2026-03-27 19:19:42 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:19:47 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 19:19:48 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 19:19:48 [INFO] Affichage du menu principal.
+2026-03-27 19:19:50 [INFO] Lancement Module Audit
+2026-03-27 19:20:08 [INFO] Connexion DB NTL réussie.
+2026-03-27 19:20:08 [ERROR] Erreur dans le menu principal : '192.168.1.0.24' does not appear to be an IPv4 or IPv6 network
+2026-03-27 19:20:08 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 19:20:16 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:20:16 [INFO] Affichage du loading_screen...
+2026-03-27 19:20:17 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:20:17 [INFO] Interface UI initialisée.
+2026-03-27 19:20:17 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:20:22 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 19:20:23 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 19:20:23 [INFO] Affichage du menu principal.
+2026-03-27 19:20:24 [INFO] Lancement Module Audit
+2026-03-27 19:20:35 [INFO] Connexion DB NTL réussie.
+2026-03-27 19:21:06 [INFO] Connexion DB NTL réussie.
+2026-03-27 19:23:08 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:23:08 [INFO] Affichage du loading_screen...
+2026-03-27 19:23:09 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:23:09 [INFO] Interface UI initialisée.
+2026-03-27 19:23:09 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:23:13 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 19:23:14 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 19:23:14 [INFO] Affichage du menu principal.
+2026-03-27 19:23:15 [INFO] Lancement Module Audit
+2026-03-27 19:23:24 [INFO] Connexion DB NTL réussie.
+2026-03-27 19:23:25 [ERROR] Erreur dans le menu principal : '192.168.1.0.24' does not appear to be an IPv4 or IPv6 network
+2026-03-27 19:23:25 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 19:23:42 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:23:42 [INFO] Affichage du loading_screen...
+2026-03-27 19:23:43 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:23:43 [INFO] Interface UI initialisée.
+2026-03-27 19:23:43 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:23:50 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:23:50 [INFO] Affichage du loading_screen...
+2026-03-27 19:23:52 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:23:52 [INFO] Interface UI initialisée.
+2026-03-27 19:23:52 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:24:00 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 19:24:01 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 19:24:01 [INFO] Affichage du menu principal.
+2026-03-27 19:24:03 [INFO] Lancement Module Audit
+2026-03-27 19:24:24 [INFO] Connexion DB NTL réussie.
+2026-03-27 19:24:29 [INFO] Connexion DB NTL réussie.
+2026-03-27 19:28:14 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:28:14 [INFO] Affichage du loading_screen...
+2026-03-27 19:28:16 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:28:16 [INFO] Interface UI initialisée.
+2026-03-27 19:28:16 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:28:22 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 19:28:23 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 19:28:23 [INFO] Affichage du menu principal.
+2026-03-27 19:28:24 [INFO] Lancement Module Diagnostic
+2026-03-27 19:28:24 [INFO] Entrée dans le module Diagnostic.
+2026-03-27 19:28:24 [INFO] Récupération de 20 équipements depuis la base NTL.
+2026-03-27 19:28:25 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 19:28:29 [INFO] Récupération de 20 équipements depuis la base NTL.
+2026-03-27 19:28:30 [INFO] Données des services AD/DNS récupérées.
+2026-03-27 19:40:03 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:40:03 [INFO] Affichage du loading_screen...
+2026-03-27 19:40:05 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:40:05 [INFO] Interface UI initialisée.
+2026-03-27 19:40:05 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:40:13 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 19:40:14 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 19:40:14 [INFO] Affichage du menu principal.
+2026-03-27 19:40:15 [INFO] Lancement Module Audit
+2026-03-27 19:40:33 [INFO] Connexion DB NTL réussie.
+2026-03-27 19:40:41 [INFO] Connexion DB NTL réussie.
+2026-03-27 19:50:06 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:50:06 [INFO] Affichage du loading_screen...
+2026-03-27 19:50:07 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:50:07 [INFO] Interface UI initialisée.
+2026-03-27 19:50:07 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:50:11 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 19:50:12 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 19:50:12 [INFO] Affichage du menu principal.
+2026-03-27 19:50:14 [INFO] Lancement Module Audit
+2026-03-27 19:50:25 [ERROR] Erreur dans le menu principal : [Errno 2] No such file or directory: 'gffdhgfh'
+2026-03-27 19:50:25 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 19:50:36 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:50:36 [INFO] Affichage du loading_screen...
+2026-03-27 19:50:37 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:50:37 [INFO] Interface UI initialisée.
+2026-03-27 19:50:37 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:50:41 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 19:50:42 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 19:50:42 [INFO] Affichage du menu principal.
+2026-03-27 19:50:43 [INFO] Lancement Module Audit
+2026-03-27 19:50:49 [ERROR] Erreur dans le menu principal : [Errno 2] No such file or directory: 'C:\\Users\\Marcel\\Desktop\\audit_network_20260326_223'
+2026-03-27 19:50:49 [INFO] Fermeture normale demandée par l'utilisateur.
+2026-03-27 19:51:00 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:51:00 [INFO] Affichage du loading_screen...
+2026-03-27 19:51:01 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:51:01 [INFO] Interface UI initialisée.
+2026-03-27 19:51:01 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:51:10 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:51:10 [INFO] Affichage du loading_screen...
+2026-03-27 19:51:12 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:51:12 [INFO] Interface UI initialisée.
+2026-03-27 19:51:12 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:51:23 [INFO] --- DÉMARRAGE NTL SYSTOOLBOX ---
+2026-03-27 19:51:23 [INFO] Affichage du loading_screen...
+2026-03-27 19:51:24 [INFO] loading_screen terminé avec succès.
+2026-03-27 19:51:24 [INFO] Interface UI initialisée.
+2026-03-27 19:51:24 [INFO] Ouverture du module de configuration des accès.
+2026-03-27 19:51:29 [INFO] Configuration chargée avec succès depuis C:\Users\Marcel\Desktop\FastPASS.txt
+2026-03-27 19:51:30 [INFO] Utilisateur authentifié. Accès Home.
+2026-03-27 19:51:30 [INFO] Affichage du menu principal.
+2026-03-27 19:51:33 [INFO] Lancement Module Audit
+2026-03-27 19:52:27 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 19:52:28 [INFO] Lancement Module Audit
+2026-03-27 19:53:20 [INFO] Connexion DB NTL réussie.
+2026-03-27 19:53:58 [INFO] Connexion DB NTL réussie.
+2026-03-27 19:55:38 [ERROR] Le module 3 a retourné une erreur (Code None)
+2026-03-27 19:55:41 [INFO] Fermeture du menu principal.
+2026-03-27 19:55:41 [INFO] Fermeture normale demandée par l'utilisateur.

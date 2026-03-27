@@ -12,53 +12,53 @@ from obsolescence.eol_api import EOLClient
 
 EXPORT_DIR = "exports"
 
-
 # =====================================================
-# EXPORT CSV
+# EXPORT JSON
 # =====================================================
 
-def export_csv(data, prefix="audit"):
-    """
-    Exporte les données dans backups/csv/ avec création automatique du dossier.
-    """
-    # 1. Définition du chemin cible
-    target_dir = os.path.join("backups", "csv")
-    
+def export_json(data, prefix="audit"):
+
+    target_dir = EXPORT_DIR
+
     try:
-        # 2. Création du dossier s'il n'existe pas
-        # exist_ok=True évite de lever une erreur si le dossier est déjà là
         os.makedirs(target_dir, exist_ok=True)
-        
-        # 3. Génération du nom de fichier avec horodatage
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{prefix}_{timestamp}.csv"
+        filename = f"{prefix}_{timestamp}.json"
         filepath = os.path.join(target_dir, filename)
-        
-        # 4. Écriture du fichier
+
         if not data:
-            logging.warning("Export CSV : Aucune donnée à exporter.")
+            logging.warning("Export JSON : Aucune donnée à exporter.")
             return None
 
-        header = ["Hostname", "IP", "OS", "Version", "EOL Date", "Statut"]
-        
-        with open(filepath, mode="w", encoding="utf-8", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow(header)
-            writer.writerows(data)
-            
-        logging.info(f"Export réussi : {filepath}")
+        json_data = []
+
+        for row in data:
+            json_data.append({
+                "hostname": row[0],
+                "ip": row[1],
+                "os": row[2],
+                "version": row[3],
+                "eol_date": row[4],
+                "status": row[5]
+            })
+
+        import json
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(json_data, f, indent=4)
+
         return filepath
 
     except Exception as e:
-        logging.error(f"Erreur lors de l'export CSV dans {target_dir} : {e}")
+        logging.error(f"Erreur export JSON : {e}")
         return None
-
 
 # =====================================================
 # STATUT EOL
 # =====================================================
 
 def get_status(eol_date):
+
     if not eol_date or eol_date == "N/A":
         return "INCONNU"
 
@@ -77,28 +77,26 @@ def get_status(eol_date):
             return "EOL < 1 AN"
         return "SUPPORTE"
 
-    except Exception as e:
-        logging.warning(f"Format de date invalide ou calcul impossible pour '{eol_date}' : {e}")
+    except:
         return "INCONNU"
 
 
 # =====================================================
-# NORMALISATION OS / VERSION
+# NORMALISATION
 # =====================================================
 
 def normalize_os(os_name):
     if not os_name:
-        logging.debug("normalize_os reçu une valeur vide.")
         return None
 
     os_name = os_name.lower()
-    
+
     if "debian" in os_name: return "debian"
     if "ubuntu" in os_name: return "ubuntu"
     if "windows server" in os_name: return "windows-server"
 
-    logging.debug(f"OS non géré par la normalisation : {os_name}")
     return None
+
 
 def normalize_version(version, os_name=None):
     if not version:
@@ -114,17 +112,13 @@ def normalize_version(version, os_name=None):
         if "." in version:
             return version.split(".")[0]
         return version
-    except Exception as e:
-        logging.error(f"Erreur lors de la normalisation de version '{version}' : {e}")
+
+    except:
         return None
 
 
 def extract_eol_date(release):
     eol = release.get("eol")
-    
-    # Log si l'objet release est vide ou mal formé
-    if not release:
-        logging.debug("extract_eol_date reçu un objet release vide.")
 
     if isinstance(eol, dict):
         return eol.get("date", "N/A")
@@ -141,153 +135,162 @@ def extract_eol_date(release):
 
 
 # =====================================================
-# FETCH BDD
+# BDD
 # =====================================================
 
 def fetch_all_assets():
-    try:
-        logging.info("Tentative de connexion à la BDD NTL...")
-        conn = get_db_connection_ntl()
-        cursor = conn.cursor()
 
-        cursor.execute("""
-            SELECT 
-                e.nom, e.ipv4, o.nom_os, o.version_os, el.date_expiration
-            FROM tb_equipements e
-            JOIN tb_os o ON e.id_os = o.id
-            LEFT JOIN tb_end_of_life el ON o.id = el.id_os
-            WHERE e.est_actif = 1
-        """)
+    conn = get_db_connection_ntl()
+    cursor = conn.cursor()
 
-        rows = cursor.fetchall()
-        conn.close()
-        logging.info(f"Récupération BDD réussie : {len(rows)} équipements actifs trouvés.")
-        return rows
-    except Exception as e:
-        logging.error(f"ECHEC FETCH BDD : {e}", exc_info=True)
-        # On relance l'exception pour que l'interface puisse afficher le message d'erreur
-        raise
+    cursor.execute("""
+        SELECT 
+            e.nom, e.ipv4, o.nom_os, o.version_os, el.date_expiration
+        FROM tb_equipements e
+        JOIN tb_os o ON e.id_os = o.id
+        LEFT JOIN tb_end_of_life el ON o.id = el.id_os
+        WHERE e.est_actif = 1
+    """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    return rows
 
 
 # =====================================================
-# LECTURE CSV
+# CSV
 # =====================================================
 
 def read_assets_from_csv(path):
-    if not os.path.exists(path):
-        logging.error(f"Fichier introuvable pour lecture : {path}")
-        raise FileNotFoundError(f"Fichier introuvable : {path}")
 
     assets = []
-    try:
-        with open(path, mode="r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            required_fields = ["hostname", "ip", "os_name", "os_version"]
 
-            if not reader.fieldnames:
-                logging.error(f"Le fichier CSV est vide ou sans entête : {path}")
-                raise ValueError("CSV vide ou mal formaté")
+    with open(path, mode="r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
 
-            missing = [field for field in required_fields if field not in reader.fieldnames]
-            if missing:
-                logging.error(f"Colonnes manquantes dans {path} : {missing}")
-                raise ValueError(f"Colonnes manquantes : {missing}")
+        for line in reader:
+            assets.append({
+                "hostname": line["hostname"],
+                "ip": line["ip"],
+                "os_name": line["os_name"],
+                "os_version": line["os_version"]
+            })
 
-            for line in reader:
-                assets.append({
-                    "hostname": (line.get("hostname") or "UNKNOWN").strip(),
-                    "ip": (line.get("ip") or "").strip(),
-                    "os_name": (line.get("os_name") or "UNKNOWN").strip(),
-                    "os_version": (line.get("os_version") or "UNKNOWN").strip()
-                })
-        
-        logging.info(f"Lecture CSV réussie : {len(assets)} lignes importées depuis {path}")
-        return assets
-    except Exception as e:
-        logging.error(f"Erreur lors de la lecture du CSV {path} : {e}")
-        raise
+    return assets
 
-
-# =====================================================
-# AUDIT CSV
-# =====================================================
 
 def audit_csv_assets(assets, client):
+
     results = []
-    logging.info(f"Début de l'audit pour {len(assets)} assets.")
 
     for asset in assets:
         h, ip = asset["hostname"], asset["ip"]
         os_n, os_v = asset["os_name"], asset["os_version"]
 
-        try:
-            product = normalize_os(os_n)
-            if not product:
-                logging.warning(f"Audit impossible pour {h} : OS '{os_n}' non reconnu.")
-                results.append([h, ip, os_n, os_v, "N/A", "INCONNU"])
-                continue
+        product = normalize_os(os_n)
 
+        if not product:
+            results.append([h, ip, os_n, os_v, "N/A", "INCONNU"])
+            continue
+
+        try:
             releases = client.list_releases(product)
             normalized_v = normalize_version(os_v, os_n)
 
-            matched = next((r for r in releases if str(r.get("cycle") or r.get("name")) == normalized_v), None)
+            matched = next(
+                (r for r in releases if str(r.get("cycle") or r.get("name")) == normalized_v),
+                None
+            )
 
             if not matched:
-                logging.warning(f"Version '{os_v}' (norm: '{normalized_v}') non trouvée pour {product} ({h}).")
                 results.append([h, ip, os_n, os_v, "N/A", "INCONNU"])
                 continue
 
             eol = extract_eol_date(matched)
             status = get_status(eol)
+
             results.append([h, ip, os_n, os_v, eol, status])
 
-        except Exception as e:
-            logging.error(f"Erreur critique lors de l'audit de {h} ({ip}) : {e}")
+        except:
             results.append([h, ip, os_n, os_v, "N/A", "INCONNU"])
 
     return results
 
 
 # =====================================================
-# FILTRAGE RESEAU
+# RESEAU
 # =====================================================
 
 def filter_by_network(network_cidr, rows):
-    try:
-        network = ipaddress.ip_network(network_cidr, strict=False)
-        filtered = [
-            r for r in rows
-            if r[1] and ipaddress.ip_address(r[1]) in network
-        ]
-        logging.info(f"Filtrage réseau {network_cidr} : {len(filtered)}/{len(rows)} équipements retenus.")
-        return filtered
-    except ValueError as e:
-        logging.error(f"Format de réseau CIDR invalide : {network_cidr} ({e})")
-        return []
+
+    network = ipaddress.ip_network(network_cidr, strict=False)
+
+    return [
+        r for r in rows
+        if r[1] and ipaddress.ip_address(r[1]) in network
+    ]
 
 
 # =====================================================
-# INTERFACE PRINCIPALE
+# UI EXPORT (CENTRALISÉ)
+# =====================================================
+
+def wait_with_export(stdscr, results, prefix):
+
+    h, w = stdscr.getmaxyx()
+
+    stdscr.addstr(h - 2, 4, "F3 : Export JSON | ESC : Retour")
+    stdscr.refresh()
+
+    key = stdscr.getch()
+
+    if key == curses.KEY_F3:
+        path = export_json(results, prefix)
+
+        if path:
+            stdscr.addstr(h - 3, 4, f"Export : {path}", curses.color_pair(2))
+        else:
+            stdscr.addstr(h - 3, 4, "Erreur export", curses.color_pair(1))
+
+        stdscr.getch()
+
+# =====================================================
+# INPUT UTILISATEUR (PROPRE)
+# =====================================================
+
+def get_input(stdscr, y, x, label, max_length=50):
+
+    stdscr.addstr(y, x, label)
+
+    # position dynamique après le texte
+    x_input = x + len(label)
+
+    curses.echo()
+    stdscr.move(y, x_input)
+    value = stdscr.getstr(y, x_input, max_length).decode().strip()
+    curses.noecho()
+
+    return value
+
+# =====================================================
+# INTERFACE
 # =====================================================
 
 def screen_obsolescence_audit(stdscr):
-    # --- INITIALISATION ---
-    logging.info("Entrée dans le module Audit d'Obsolescence.")
-    
-    # Configuration Curses
+
     stdscr.keypad(True)
-    curses.curs_set(0)  # Masquer le curseur
-    
-    # Initialisation des couleurs (une seule fois au début)
+    curses.curs_set(0)
+
     curses.start_color()
     curses.use_default_colors()
-    curses.init_pair(1, curses.COLOR_WHITE, -1) # Texte normal
-    curses.init_pair(2, curses.COLOR_GREEN, -1) # Sélection (Vert)
-    curses.init_pair(3, curses.COLOR_CYAN, -1)  # Titre
-    
+    curses.init_pair(1, curses.COLOR_WHITE, -1)
+    curses.init_pair(2, curses.COLOR_GREEN, -1)
+    curses.init_pair(3, curses.COLOR_CYAN, -1)
+
     client = EOLClient()
     current_row = 0
-    
+
     MODULES = [
         "Lister les versions d’un OS et leurs dates de fin de vie",
         "Lister les composants d’une plage réseau",
@@ -297,149 +300,172 @@ def screen_obsolescence_audit(stdscr):
     ]
 
     while True:
-        try:
-            stdscr.clear()
-            h, w = stdscr.getmaxyx()
 
-            # --- AFFICHAGE DU TITRE ---
-            title = "--- MODULE AUDIT D'OBSOLESCENCE ---"
-            stdscr.attron(curses.color_pair(3) | curses.A_BOLD)
-            stdscr.addstr(2, max(0, (w - len(title)) // 2), title)
-            stdscr.attroff(curses.color_pair(3) | curses.A_BOLD)
+        stdscr.clear()
+        h, w = stdscr.getmaxyx()
 
-            # --- AFFICHAGE DU MENU ---
-            for i, module in enumerate(MODULES):
-                x = 4
-                y = 6 + i
-                
-                if i == current_row:
-                    # STYLE SÉLECTIONNÉ : Vert + Gras + Indicateur ">"
-                    stdscr.attron(curses.color_pair(2) | curses.A_BOLD)
-                    stdscr.addstr(y, x, f" > {module}")
-                    stdscr.attroff(curses.color_pair(2) | curses.A_BOLD)
-                else:
-                    # STYLE NORMAL : Blanc
-                    stdscr.attron(curses.color_pair(1))
-                    stdscr.addstr(y, x, f"   {module}")
-                    stdscr.attroff(curses.color_pair(1))
+        title = "--- MODULE AUDIT D'OBSOLESCENCE ---"
+        stdscr.attron(curses.color_pair(3) | curses.A_BOLD)
+        stdscr.addstr(2, (w - len(title)) // 2, title)
+        stdscr.attroff(curses.color_pair(3) | curses.A_BOLD)
 
-            # --- FOOTER ---
-            footer = "↑/↓ : Naviguer | ENTER : Sélectionner | ESC : Retour"
-            if h > 10: # Évite de crash sur de très petites fenêtres
-                stdscr.addstr(h - 1, max(0, (w - len(footer)) // 2), footer)
-            
-            stdscr.refresh()
+        for i, module in enumerate(MODULES):
 
-            # --- GESTION DES TOUCHES ---
-            key = stdscr.getch()
+            if i == current_row:
+                stdscr.attron(curses.color_pair(2) | curses.A_BOLD)
+                stdscr.addstr(6 + i, 4, f" > {module}")
+                stdscr.attroff(curses.color_pair(2) | curses.A_BOLD)
+            else:
+                stdscr.addstr(6 + i, 4, f"   {module}")
 
-            if key == curses.KEY_UP and current_row > 0:
-                current_row -= 1
-            elif key == curses.KEY_DOWN and current_row < len(MODULES) - 1:
-                current_row += 1
-            elif key == 27: # ESC
-                logging.info("Sortie du module via touche ESC.")
-                break
-            
-            elif key in (curses.KEY_ENTER, 10, 13):
-                logging.info(f"Exécution de : {MODULES[current_row]}")
-                
-                # --- LOGIQUE DES OPTIONS ---
-                
-                if current_row == 0: # API EOL DIRECT
+        stdscr.addstr(h - 1, (w - 40) // 2, "↑/↓ : Naviguer | ENTER : Sélectionner | ESC : Retour")
+
+        stdscr.refresh()
+        key = stdscr.getch()
+
+        if key == curses.KEY_UP and current_row > 0:
+            current_row -= 1
+
+        elif key == curses.KEY_DOWN and current_row < len(MODULES) - 1:
+            current_row += 1
+
+        elif key == 27:
+            return
+
+        elif key in (10, 13):
+
+            # API
+            if current_row == 0:
+
+                stdscr.clear()
+
+                product = get_input(stdscr,5,4,"Produit (ex: ubuntu, debian, windows-server): ")    
+
+                try:
+                    releases = client.list_releases(product)
+
                     stdscr.clear()
-                    prompt = "Produit (ex: ubuntu, debian, windows-server) : "
-                    stdscr.addstr(5, 4, prompt)
-                    curses.echo()
-                    product = stdscr.getstr(5, 4 + len(prompt)).decode('utf-8').strip().lower()
-                    curses.noecho()
+                    stdscr.addstr(3, 4, f"Versions pour {product}")
+                    stdscr.addstr(5, 4, "VERSION        EOL DATE        STATUT")
 
-                    if product:
-                        try:
-                            releases = client.list_releases(product)
-                            stdscr.clear()
-                            stdscr.addstr(2, 4, f"Versions pour {product.upper()} :", curses.A_BOLD)
-                            stdscr.addstr(4, 4, f"{'VERSION':<15} {'EOL DATE':<15} {'STATUT'}")
-                            
-                            for idx, r in enumerate(releases):
-                                if 6 + idx >= h - 2: break
-                                ver = r.get("cycle") or r.get("name") or "N/A"
-                                eol = extract_eol_date(r)
-                                stat = get_status(eol)
-                                stdscr.addstr(6 + idx, 4, f"{ver:<15} {eol:<15} {stat}")
-                            
-                            stdscr.addstr(h-1, 4, "Appuyez sur une touche...")
-                            stdscr.getch()
-                        except Exception as e:
-                            logging.error(f"Erreur API : {e}")
-                            stdscr.addstr(7, 4, "Erreur : Produit introuvable ou problème réseau.")
-                            stdscr.getch()
+                    for i, r in enumerate(releases):
+                        if 7 + i >= h - 2:
+                            break
+                        version = r.get("cycle") or r.get("name")
+                        eol = extract_eol_date(r)
+                        status = get_status(eol)
+                        stdscr.addstr(7 + i, 4, f"{version:<15} {eol:<15} {status}")
 
-                elif current_row == 1: # RÉSEAU CIDR
+                    stdscr.getch()
+
+                except:
+                    stdscr.addstr(7, 4, "Erreur API")
+                    stdscr.getch()
+
+            # RESEAU
+            elif current_row == 1:
+
+                stdscr.clear()
+
+                cidr = get_input(stdscr,5,4,"Réseau CIDR (ex: 192.168.1.0/24): ")
+
+                rows = fetch_all_assets()
+                filtered = filter_by_network(cidr, rows)
+
+                results = [[r[0], r[1], r[2], r[3], "N/A", "INCONNU"] for r in filtered]
+
+                stdscr.clear()
+                stdscr.addstr(3, 4, f"Résultats {cidr}")
+                stdscr.addstr(5, 4, f"{'HOSTNAME':<20} {'IP':<18} {'OS':<25} {'VERSION':<10}")
+
+                for i, r in enumerate(results):
+                    if 7 + i >= h - 3:
+                        break
+                    hostname = r[0]
+                    ip = r[1]
+                    os_name = r[2]
+                    version = r[3]
+
+                    stdscr.addstr(7 + i, 4, f"{hostname:<20} {ip:<18} {os_name:<25} {version:<10}")
+
+                wait_with_export(stdscr, results, "network")
+
+            # AUDIT BDD
+            elif current_row == 2:
+
+                stdscr.clear()
+                stdscr.addstr(5, 4, "Audit en cours...")
+                stdscr.refresh()
+
+                data = fetch_all_assets()
+                results = [[r[0], r[1], r[2], r[3], str(r[4]), get_status(r[4])] for r in data]
+
+                stdscr.clear()
+                stdscr.addstr(3, 4, "Résultat audit")
+                stdscr.addstr(5, 4, f"{'HOSTNAME':<20} {'IP':<18} {'OS':<25} {'VERSION':<10} {'EOL DATE':<12} {'STATUT':<12}")
+
+                for i, r in enumerate(results):
+                    if 7 + i >= h - 3:
+                        break
+                    hostname = r[0]
+                    ip = r[1]
+                    os_name = r[2]
+                    version = r[3]
+                    eol = r[4]
+                    status = r[5]
+
+                    stdscr.addstr(7 + i, 4, f"{hostname:<20} {ip:<18} {os_name:<25} {version:<10} {eol:<12} {status:<12}")
+
+                wait_with_export(stdscr, results, "db_audit")
+
+            # AUDIT CSV
+            elif current_row == 3:
+
+                stdscr.clear()
+
+                stdscr.addstr(3, 4, "Audit depuis fichier CSV")
+
+                stdscr.addstr(5, 4, "Format attendu : CSV avec entêtes obligatoires")
+                stdscr.addstr(6, 4, "hostname, ip, os_name, os_version")
+                stdscr.addstr(7, 4, "Ex : srv-01,192.168.1.10,ubuntu,20.04")
+
+                path = get_input(stdscr, 9, 4, "Chemin CSV : ")
+
+                try:
+                    assets = read_assets_from_csv(path)
+
+                    if not assets:
+                        raise ValueError("Aucune donnée valide dans le fichier")
+
+                    results = audit_csv_assets(assets, client)
+
                     stdscr.clear()
-                    prompt = "Entrez le réseau CIDR (ex: 192.168.1.0/24) : "
-                    stdscr.addstr(5, 4, prompt)
-                    curses.echo()
-                    cidr = stdscr.getstr(5, 4 + len(prompt)).decode('utf-8').strip()
-                    curses.noecho()
+                    stdscr.addstr(3, 4, "Résultat audit CSV")
 
-                    try:
-                        all_data = fetch_all_assets()
-                        filtered = filter_by_network(cidr, all_data)
-                        
-                        stdscr.clear()
-                        stdscr.addstr(2, 4, f"Résultats pour {cidr} ({len(filtered)} machines) :", curses.A_BOLD)
-                        
-                        display_rows = []
-                        for idx, r in enumerate(filtered):
-                            row_info = [r[0], r[1], r[2], r[3], "N/A", "INCONNU"]
-                            display_rows.append(row_info)
-                            if 4 + idx < h - 4:
-                                stdscr.addstr(4 + idx, 4, f"{r[0]:<15} {r[1]:<15} {r[2]:<15}")
-                        
-                        stdscr.addstr(h-2, 4, "F3 : Export CSV | Autre touche : Retour")
-                        k = stdscr.getch()
-                        if k == curses.KEY_F3:
-                            path = export_csv(display_rows, "network")
-                            stdscr.addstr(h-3, 4, f"Exporté dans : {path}", curses.color_pair(2))
-                            stdscr.getch()
-                    except Exception as e:
-                        stdscr.addstr(7, 4, f"Erreur : {e}")
-                        stdscr.getch()
+                    stdscr.addstr(
+                        5,
+                        4,
+                        f"{'HOSTNAME':<20} {'IP':<18} {'OS':<25} {'VERSION':<10} {'EOL DATE':<12} {'STATUT':<12}"
+                    )
 
-                elif current_row == 2: # AUDIT BDD
-                    stdscr.clear()
-                    stdscr.addstr(5, 4, "Analyse de la base de données...")
-                    stdscr.refresh()
-                    try:
-                        data = fetch_all_assets()
-                        results = [[r[0], r[1], r[2], r[3], str(r[4]), get_status(r[4])] for r in data]
-                        path = export_csv(results, "db_audit")
-                        stdscr.addstr(7, 4, f"Audit terminé ! Fichier : {path}")
-                        stdscr.getch()
-                    except Exception as e:
-                        logging.error(f"Audit BDD failed : {e}")
-                        stdscr.getch()
+                    stdscr.addstr(6, 4, "-" * 100)
 
-                elif current_row == 3: # AUDIT CSV
-                    stdscr.clear()
-                    prompt = "Chemin du fichier CSV : "
-                    stdscr.addstr(5, 4, prompt)
-                    curses.echo()
-                    path_in = stdscr.getstr(5, 4 + len(prompt)).decode('utf-8').strip()
-                    curses.noecho()
-                    try:
-                        assets = read_assets_from_csv(path_in)
-                        results = audit_csv_assets(assets, client)
-                        path_out = export_csv(results, "csv_audit")
-                        stdscr.addstr(8, 4, f"Audit CSV terminé. Résultats dans : {path_out}")
-                        stdscr.getch()
-                    except Exception as e:
-                        stdscr.addstr(8, 4, f"Erreur : {e}")
-                        stdscr.getch()
+                    for i, r in enumerate(results):
+                        if 8 + i >= h - 3:
+                            break
 
-                elif current_row == 4: # RETOUR
-                    return
+                        stdscr.addstr(
+                            8 + i,
+                            4,
+                            f"{r[0]:<20} {r[1]:<18} {r[2]:<25} {r[3]:<10} {r[4]:<12} {r[5]:<12}"
+                        )
 
-        except curses.error as e:
-            logging.error(f"Erreur d'affichage Curses : {e}")
+                    wait_with_export(stdscr, results, "csv_audit")
+
+                except ValueError as e:
+                    stdscr.addstr(11, 4, f"Erreur : {str(e)}", curses.color_pair(1))
+                    stdscr.addstr(13, 4, "Appuyez sur une touche pour continuer")
+                    stdscr.getch()
+
+            elif current_row == 4:
+                return
